@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind utilities;
+@tailwind components;
+
+img {
+  @apply select-none pointer-events-none
+}
+
+a {
+  @apply text-primary hover:underline
+  
+}
+
+button {
+  @apply data-[pressed=true]:scale-100 !important
+}
+
+.epr_-8623pq {
+  @apply bg-background rounded-full border-2 border-default focus:border-primary !important;
+}
+
+[contentEditable=true]:empty::before {
+  content: attr(aria-placeholder);
+  opacity: .6;
+}

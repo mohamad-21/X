@@ -197,11 +197,11 @@ function Twitt({
           />
         )}
         {twitt.media && ["image", "gif"].includes(twitt.media_type ?? "") && (
-          <div className="border border-default mt-4 rounded-2xl">
+          <div className="to-twitt mt-4">
             <img
               src={twitt.media}
               alt={twitt.text}
-              className={`${imageSize.width ? "" : "hidden"} rounded-2xl to-twitt object-cover`}
+              className={`${imageSize.width ? "" : "hidden"} to-twitt object-cover rounded-2xl border border-default mx-auto block`}
               onLoad={(target) => {
                 setSmageSize({
                   width: target.currentTarget.naturalWidth,
@@ -212,7 +212,7 @@ function Twitt({
               height={imageSize.height}
             />
             {!imageSize.width && (
-              <div className="w-full h-[300px] flex items-center justify-center">
+              <div className="w-full h-[300px] flex items-center justify-center to-twitt border border-default rounded-2xl">
                 <LoadingSpinner noPadding />
               </div>
             )}

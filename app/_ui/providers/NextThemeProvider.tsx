@@ -8,10 +8,10 @@ function NextThemeProvider({ children }: { children: React.ReactNode }) {
   const reviewRoutes = ['/', '/i/flow/login', '/i/flow/signup'];
   const pathname = usePathname();
   const allowedProvideTheme = !reviewRoutes.includes(pathname);
-  const defaultTheme = !allowedProvideTheme ? 'dark' : undefined;
+  const defaultTheme = 'dark';
 
   return (
-    <ThemeProvider defaultTheme={defaultTheme} forcedTheme={defaultTheme} attribute="class">
+    <ThemeProvider defaultTheme="dark" forcedTheme={defaultTheme} themes={['dark']} attribute="class">
       {children}
     </ThemeProvider >
   );

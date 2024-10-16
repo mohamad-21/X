@@ -15,22 +15,23 @@ const config: Config = {
       }
     },
   },
-  darkMode: "class",
+  // darkMode: "class",
   plugins: [
     nextui({
       themes: {
         light: {
           colors: {
-            default: {
-              DEFAULT: "#000",
-              foreground: "#e7e9ea"
-            },
-            background: "#e7e9ea",
-            foreground: "#000",
+            background: "#000",
+            foreground: "#e7e9ea",
             primary: {
               DEFAULT: "#1d9bf0",
               foreground: "#e7e9ea",
             },
+            secondary: {
+              DEFAULT: "#e7e9ea",
+              foreground: "#000",
+            },
+            danger: '#f4212e',
           },
         },
         dark: {

@@ -1,6 +1,5 @@
 import { Session } from "next-auth";
 import React from "react";
-import Logo from "./Logo";
 import Link from "next/link";
 
 function Header({ user }: { user: Session['user'] }) {
@@ -16,7 +15,6 @@ function Header({ user }: { user: Session['user'] }) {
             className="rounded-full w-[35px] h-[35px]"
           />
         </Link>
-        <Logo className="absolute left-1/2 -translate-x-1/2" width={27} height={27} />
         <Link href="#">Get Premium</Link>
       </div>
     </header>

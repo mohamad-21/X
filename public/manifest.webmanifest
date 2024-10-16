@@ -3,12 +3,5 @@
 	"short_name": "X",
 	"description": "X",
 	"start_url": "/",
-	"display": "standalone",
-	"icons": [
-		{
-			"src": "/images/logo-black.png",
-			"sizes": "any",
-			"type": "image/png"
-		}
-	]
+	"display": "standalone"
 }

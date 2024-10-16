@@ -64,7 +64,7 @@ function Twitt({
       }
     },
     {
-      refreshInterval: 5000,
+      refreshInterval: 10000,
     }
   );
 

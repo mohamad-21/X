@@ -8,6 +8,7 @@ import { Modal } from "@nextui-org/modal";
 import React, { useRef } from "react";
 import { Provider } from "react-redux";
 import useSWR from "swr";
+import PageLockLoading from "../PageLockLoading";
 
 function StoreProvider({ children }: { children: React.ReactNode }) {
   const storeRef = useRef<AppStore>();
@@ -34,17 +35,13 @@ function AppProvider({ children }: { children: React.ReactNode }) {
       dispatch(setNotifications(data));
     }
   }, {
-    refreshInterval: 10000
+    refreshInterval: 20000
   });
 
   return (
     <>
       {isChangingRoute && (
-        <Modal isOpen shouldBlockScroll>
-          <div className="bg-gray-700/40 fixed z-10 inset-0 flex items-center justify-center">
-            <LoadingSpinner noPadding />
-          </div>
-        </Modal>
+        <PageLockLoading />
       )}
       {children}
     </>

@@ -6,8 +6,9 @@ import OAuthButton from "@/app/_ui/OAuthButton";
 import { AppleFilled } from "@ant-design/icons";
 import GoogleIcon from "@/app/_ui/GoogleIcon";
 import Link from "next/link";
-import { signinWithGoogle } from "@/app/_lib/actions";
+import { signinWithCredentials, signinWithGoogle } from "@/app/_lib/actions";
 import { useRouter } from "next/navigation";
+import DemoLoginButton from "./DemoLoginButton";
 
 function SignupForm() {
   const router = useRouter();
@@ -23,10 +24,11 @@ function SignupForm() {
         <div className="max-w-[300px]">
           <h2 className="sm:text-3xl text-xl font-bold mb-6">Join today.</h2>
           <div className="flex flex-col gap-2.5">
+            <DemoLoginButton />
             <form action={signinWithGoogle}>
               <OAuthButton logo={<GoogleIcon />}><span className="text-[15px] font-bold">Sign up with Google</span></OAuthButton>
             </form>
-            <OAuthButton logo={<AppleFilled width={30} height={30} />}>Sign up with Apple</OAuthButton>
+            {/* <OAuthButton logo={<AppleFilled width={30} height={30} />}>Sign up with Apple</OAuthButton> */}
             <div className="relative flex items-center justify-center before:absolute before:left-0 after:right-0 after:absolute before:bg-gray-700 before:h-[0.2px] before:w-[45%]  after:bg-gray-700 after:h-[0.2px] after:w-[45%]">
               <span className="relative ">or</span>
             </div>

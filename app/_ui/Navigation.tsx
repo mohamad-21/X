@@ -89,11 +89,11 @@ function Navigation({ user }: { user: SessionUser }) {
   return (
     <>
       <ul className="hidden sm:flex flex-col xl:items-stretch items-center gap-2 w-full max-w-[235px]">
-        <li>
+        {/* <li>
           <Button as={Link} href="/home" size="lg" isIconOnly className=" flex hover:no-underline min-w-max items-center xl:px-3 justify-center gap-4 text-xl" variant="light" radius="full">
             <Logo width={30} height={30} />
           </Button>
-        </li>
+        </li> */}
         {links.map((link, idx) => (
           <li key={idx}>
             {idx === 0 ? (

@@ -1,11 +1,9 @@
 "use server";
 
-import { ID } from "appwrite";
 import bcrypt from "bcryptjs";
 import { ResultSetHeader } from "mysql2";
 import { AuthError } from "next-auth";
 import { revalidatePath } from "next/cache";
-import { storage } from "./appwrite";
 import { auth, signIn, signOut } from "./auth";
 import { query } from "./db";
 import {
@@ -349,7 +347,7 @@ export async function signupWithCredentials(
     Math.floor(Math.random() * (99999 - 10000 + 1)) +
     10000;
   const defaultProfile =
-    "https://cloud.appwrite.io/v1/storage/buckets/66d0a02800176fb696ad/files/66ede78f000632afeb19/view?project=66d09f8b003509928242&project=66d09f8b003509928242";
+    "https://utfs.io/f/K02DyyEnuX6Ge6tBLFJ7Bn81ARI2iUGhuxaLX4rYT9gE5WoK";
 
   try {
     await query(
@@ -368,6 +366,10 @@ export async function signupWithCredentials(
       };
     }
   }
+}
+
+export async function updateProfilePhoto({ email, profileUrl }: { email: string, profileUrl: string }) {
+  await query("update users set profile = ? where email = ?", [profileUrl, email]);
 }
 
 export async function signupWithOAuth(data: OAuthData): Promise<ActionError> {
@@ -392,104 +394,6 @@ export async function signupWithOAuth(data: OAuthData): Promise<ActionError> {
         message: "an error occurred.",
       };
     }
-  }
-}
-
-export async function uploadProfile(formData: FormData) {
-  const file = <File>formData.get("upload")!;
-  const email = <string>formData.get("email")!;
-
-  if (!file.type.startsWith("image/")) {
-    throw new Error("image type not allowed. only image files allowed.");
-  }
-
-  // const fileSize = Math.floor(file.size / 1024);
-  // if (fileSize > 700) return {
-  //   message: 'upload size must be less than 700 KB.'
-  // };
-
-  try {
-    const upload = await storage.createFile(
-      process.env.APPWRITE_PROFILES_BUCKET_ID!,
-      ID.unique(),
-      file
-    );
-
-    const uploadUrl = storage.getFileView(
-      process.env.APPWRITE_PROFILES_BUCKET_ID!,
-      upload.$id
-    );
-
-    await query("update users set profile = ? where email = ?", [
-      uploadUrl.toString(),
-      email,
-    ]);
-  } catch (err: any) {
-    console.error(err);
-    throw new Error(err.message);
-  }
-}
-
-export async function uploadHeaderPhoto(formData: FormData) {
-  const file = <File>formData.get("upload")!;
-  if (!file.type.startsWith("image/")) {
-    throw new Error("image type not allowed. only image files allowed.");
-  }
-
-  const email = <string>formData.get("email")!;
-
-  // const fileSize = Math.floor(file.size / 1024);
-  // if (fileSize > 700) return {
-  //   message: 'upload size must be less than 700 KB.'
-  // };
-
-  try {
-    const upload = await storage.createFile(
-      process.env.APPWRITE_USERS_HEADER_PHOTO_BUCKET_ID!,
-      ID.unique(),
-      file
-    );
-
-    const uploadUrl = storage.getFileView(
-      process.env.APPWRITE_USERS_HEADER_PHOTO_BUCKET_ID!,
-      upload.$id
-    );
-
-    await query("update users set header_photo = ? where email = ?", [
-      uploadUrl.toString(),
-      email,
-    ]);
-  } catch (err: any) {
-    console.error(err);
-    throw new Error(err.message);
-  }
-}
-
-export async function uploadTwittMedia(formData: FormData) {
-  const file = <File>formData.get("media");
-  if (!file.type.startsWith("video/") && !file.type.startsWith("image/")) {
-    throw new Error(
-      "media type not allowed. only image and video files allowed.",
-      { cause: "media" }
-    );
-  }
-
-  try {
-    const upload = await storage.createFile(
-      process.env.APPWRITE_TWITT_IMAGES_BUCKET_ID!,
-      ID.unique(),
-      file
-    );
-
-    const uploadUrl = storage.getFileView(
-      process.env.APPWRITE_TWITT_IMAGES_BUCKET_ID!,
-      upload.$id
-    );
-
-    return uploadUrl.toString();
-  } catch (err: any) {
-    console.error(err);
-    throw new Error(err.message);
   }
 }
 
@@ -564,24 +468,12 @@ export async function addTwitt({
   let values = "?,?,?,?,?,?";
   let params = [userId, text, "[]", "[]", "[]", `["${userId}"]`];
 
-  if (formData?.get("media")) {
-    try {
-      const media = formData.get("media") as File;
-      const uploadUrl = await uploadTwittMedia(formData);
-      fields += ", media, media_type";
-      values += ",?,?";
-      params.push(uploadUrl, media.type.split("/")[0]);
-    } catch (err: any) {
-      console.error(err.message);
-      return {
-        error: {
-          message:
-            (err as Error).cause === "media"
-              ? err.message
-              : "an error occurred",
-        },
-      };
-    }
+  if (formData?.get("mediaUrl") && formData?.get("mediaType")) {
+    const mediaUrl = formData.get("mediaUrl") as string;
+    const mediaType = formData.get("mediaType") as string;
+    fields += ", media, media_type";
+    values += ",?,?";
+    params.push(mediaUrl, mediaType.split("/")[0]);
   }
 
   if (gif) {
@@ -597,14 +489,12 @@ export async function addTwitt({
   }
 
   try {
-    const [result, replyedtoTwitt] = await Promise.all([
-      query<ResultSetHeader>(
-        `insert into twitts (${fields}) values (${values})`,
-        params
-      ),
-      query<{ user_id: number }[]>("select user_id from twitts where id = ?", [replyTo])
-    ])
+    const result = await query<ResultSetHeader>(
+      `insert into twitts (${fields}) values (${values})`,
+      params
+    );
     if (replyTo) {
+      const replyedtoTwitt = await query<{ user_id: number }[]>("select user_id from twitts where id = ?", [replyTo])
       await Promise.all([
         query(
           "update twitts set comments = json_array_append(comments, '$', ?) where id = ?",
@@ -705,36 +595,27 @@ export async function unFollow(
 export async function updateUserInfo(formData: FormData): Promise<ActionError> {
   const name = formData.get("name") as string;
   const email = formData.get("email") as string;
-  const username = formData.get("username") as string;
   const bio = formData.get("bio") as string;
   const website = formData.get("website") as string;
   const location = formData.get("location") as string;
-  const header_photo_upload = formData.get("header_photo_upload") as string;
-  const profile_photo_upload = formData.get("profile_photo_upload") as string;
+  const header_photo_url = formData.get("header_photo") as string;
+  const profile_photo_url = formData.get("profile_photo") as string;
 
-  let updateQuery =
-    "update users set name=?, bio=?, website=?, location=? where email = ?";
-  const params = [name, bio, website, location, email];
-  const promises: Promise<any>[] = [];
-  const headerPhotoFormData = new FormData();
-  const profilePhotoFormData = new FormData();
+  let fields = "name=?, bio=?, website=?, location=?";
+  const params = [name, bio, website, location];
 
-  promises.push(query(updateQuery, params));
-
-  if (header_photo_upload) {
-    headerPhotoFormData.append("upload", header_photo_upload);
-    headerPhotoFormData.append("email", email);
-    promises.push(uploadHeaderPhoto(headerPhotoFormData));
+  if (profile_photo_url) {
+    fields += ", profile=?";
+    params.push(profile_photo_url);
   }
 
-  if (profile_photo_upload) {
-    profilePhotoFormData.append("upload", profile_photo_upload);
-    profilePhotoFormData.append("email", email);
-    promises.push(uploadProfile(profilePhotoFormData));
+  if (header_photo_url) {
+    fields += ", header_photo=?";
+    params.push(header_photo_url);
   }
 
   try {
-    await Promise.all(promises);
+    await query(`update users set ${fields} where email = ?`, [...params, email]);
     revalidatePath("/", "layout");
   } catch (err) {
     console.error(err);

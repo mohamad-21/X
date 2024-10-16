@@ -37,6 +37,7 @@ import { LuImage } from "react-icons/lu";
 import { MdGif } from "react-icons/md";
 import { useSWRConfig } from "swr";
 import Alert from "@/app/_ui/Alert";
+import { uploadFiles } from "@/app/_utils/uploadthing";
 
 type Props = {
   user: SessionUser;
@@ -125,9 +126,12 @@ function CreatePost({
         text: fullText,
       };
       if (media.upload) {
+        const [res] = await uploadFiles("imageUploader", { files: [media.upload] });
+        if (!res) return setError("upload error");
         const formData = new FormData();
-        formData.append("media", media.upload);
         twittData.formData = formData;
+        formData.append("mediaUrl", res.url);
+        formData.append("mediaType", res.type);
       }
       if (gif) twittData.gif = gif;
       if (replyTo) twittData.replyTo = replyTo.id;

@@ -3,10 +3,11 @@ import React, { ChangeEvent, useState } from "react";
 import Logo from "@/app/_ui/Logo";
 import { Avatar, Button } from "@nextui-org/react";
 import { CameraOutlined } from "@ant-design/icons";
-import { uploadProfile } from "@/app/_lib/actions";
+import { updateProfilePhoto } from "@/app/_lib/actions";
 import { useAppDispatch, useAppSelector } from "@/app/_lib/hooks";
 import { setSignupData } from "@/app/_lib/slices/userSlice";
 import { useSession } from "next-auth/react";
+import { uploadFiles } from "@/app/_utils/uploadthing";
 
 function Step4({ onTransition }: { onTransition: (callback: () => Promise<any>) => void }) {
   const [error, setError] = useState<string | null>(null);
@@ -19,11 +20,10 @@ function Step4({ onTransition }: { onTransition: (callback: () => Promise<any>) 
     if (error) return;
     onTransition(async () => {
       const file = e.target.files![0];
-      const formData = new FormData();
-      formData.append('upload', file);
-      formData.append('email', user!.email);
       try {
-        await uploadProfile(formData);
+        const [res] = await uploadFiles("imageUploader", { files: [file] });
+        if (!res) throw new Error("upload error");
+        await updateProfilePhoto({ email: user?.email!, profileUrl: res.url });
       } catch (err: any) {
         return setError(err.message);
       }

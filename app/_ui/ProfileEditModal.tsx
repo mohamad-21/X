@@ -12,6 +12,7 @@ import { updateUserInfo } from "@/app/_lib/actions";
 import LoadingSpinner from "./LoadingSpinner";
 import Alert from "./Alert";
 import { useSession } from "next-auth/react";
+import { uploadFiles } from "../_utils/uploadthing";
 
 type UserInfo = {
   name: string;
@@ -79,13 +80,25 @@ function ProfileEditModal({ user }: { user: User & { twitts: ITwitt[] } }) {
     const formData = new FormData();
     formData.set("name", userInfo.name);
     formData.set("email", user.email);
-    formData.set("username", user.username);
     formData.set("bio", userInfo.bio || '');
     formData.set("website", userInfo.website || '');
     formData.set("location", userInfo.location || '');
-    formData.set("header_photo_upload", userInfo.header_photo.upload || '');
-    formData.set("profile_photo_upload", userInfo.profile.upload || '');
     startTransition(async () => {
+      if (userInfo.profile.upload || userInfo.header_photo.upload) {
+        const files: { file: File, type: "profile_photo" | "header_photo" }[] = [];
+        if (userInfo.profile.upload) {
+          files.push({ file: userInfo.profile.upload, type: "profile_photo" });
+        }
+        if (userInfo.header_photo.upload) {
+          files.push({ file: userInfo.header_photo.upload, type: "header_photo" });
+        }
+        const filesOnly: File[] = files.map(file => file.file);
+        const res = await uploadFiles("imageUploader", { files: filesOnly });
+        files.forEach((file, idx) => {
+          formData.set(file.type, res[idx].url);
+        })
+      }
+
       const error = await updateUserInfo(formData);
       if (error) return setError(error.message);
       update('trigger');

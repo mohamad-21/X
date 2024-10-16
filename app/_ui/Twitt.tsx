@@ -245,17 +245,17 @@ function Twitt({
                   className="whitespace-pre-wrap -mt-1 break-words to-twitt"
                   dir={/[\u0600-\u06FF]/.test(twitt.text) ? "rtl" : "ltr"}
                   dangerouslySetInnerHTML={{
-                    __html: 'Lorem, ipsum dolor sit amet consectetur adipisicing elit. Illo facilis incidunt ipsam quod at ex asperiores recusandae, fuga architecto labore ab, molestiae laborum totam aliquid velit, vel beatae exercitationem! Vero!',
+                    __html: twitt.text,
                   }}
                 />
               )}
               {twitt.media &&
                 ["image", "gif"].includes(twitt.media_type ?? "") && (
-                  <div className="border border-default mt-4 to-twitt rounded-2xl ">
+                  <div className="mt-4 to-twitt">
                     <img
                       src={twitt.media}
                       alt={twitt.text}
-                      className={`${imageSize.width ? "" : "hidden"} to-twitt object-cover rounded-2xl`}
+                      className={`${imageSize.width ? "" : "hidden"} to-twitt object-cover rounded-2xl border border-default mx-auto block`}
                       onLoad={(target) => {
                         setSmageSize({
                           width: target.currentTarget.naturalWidth,
@@ -266,7 +266,7 @@ function Twitt({
                       height={imageSize.height}
                     />
                     {!imageSize.width && (
-                      <div className="w-full h-[300px] flex items-center justify-center to-twitt">
+                      <div className="w-full h-[300px] flex items-center justify-center to-twitt border border-default rounded-2xl">
                         <LoadingSpinner noPadding />
                       </div>
                     )}

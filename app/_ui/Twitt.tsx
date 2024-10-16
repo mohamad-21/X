@@ -192,7 +192,7 @@ function Twitt({
       onClick={handleTwittClick}
     >
       {mediaOnly ? (
-        <Link href={`/${user.username}`} className="w-full h-full">
+        <Link href={`/${user.username}/status/${twitt.id}`} className="w-full h-full">
           <img
             src={twitt.media!}
             className="w-full object-cover aspect-square"

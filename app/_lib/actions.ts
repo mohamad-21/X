@@ -103,12 +103,13 @@ export async function getUserByUsername(
 
 export async function getUserById(
   id: number | string,
-  twittsWithReply: boolean = false
+  twittsWithReply: boolean = false,
+  mediaOnly: boolean = false
 ): Promise<(User & { twitts: ITwitt[] }) | null> {
   const result = await query<User[]>("select * from users where id = ?", [id]);
 
   if (result.length < 1) return null;
-  const userTwitts = await getAlltwitts({
+  const userTwitts = mediaOnly ? await getUserTwittsByMedia(id) : await getAlltwitts({
     byUsername: true,
     username: result[0].username!,
     with_reply: twittsWithReply,
@@ -625,7 +626,7 @@ export async function updateUserInfo(formData: FormData): Promise<ActionError> {
 
 export async function getUserTwittsByMedia(user_id: number | string) {
   const twitts = await query<ITwitt[]>(
-    `select twitts.id, twitts.text, twitts.media, twitts.created_at, twitts.media_type, twitts.likes, twitts.views, twitts.reply_to, twitts.comments, twitts.retwitts, users.id as user_id, users.username, users.name, users.profile as user_profile from twitts join users on twitts.user_id = users.id where users.id = ? or users.username = ? and not media is null order by twitts.id desc`,
+    `select twitts.id, twitts.text, twitts.media, twitts.created_at, twitts.media_type, twitts.likes, twitts.views, twitts.reply_to, twitts.comments, twitts.retwitts, users.id as user_id, users.username, users.name, users.profile as user_profile from twitts join users on twitts.user_id = users.id where (users.id = ? or users.username = ?) and not (twitts.media is null) order by twitts.id desc`,
     [user_id, user_id]
   );
   return twitts;

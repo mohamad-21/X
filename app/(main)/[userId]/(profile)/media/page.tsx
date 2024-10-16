@@ -22,7 +22,7 @@ async function Page({ params }: { params: { userId: string } }) {
   return (
     <div className="px-1 py-6">
       {userTwitts.length > 0 ? (
-        <TwittsList mediaOnly session={session} allTwitts={userTwitts} />
+        <TwittsList mediaOnly userId={session?.user.id} session={session} allTwitts={userTwitts} />
       ) : (
         <div className="mx-auto max-w-xs">
           <h1 className="text-3xl font-extrabold mb-1">

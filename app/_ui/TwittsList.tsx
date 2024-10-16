@@ -42,8 +42,8 @@ function TwittsList({
         `${process.env.NEXT_PUBLIC_URL}/api/${type === "comments"
           ? `twitts/comments?id=${twittId}`
           : userId
-            ? `user/twitts?id=${userId}${type === "without_replies" ? "&include_replies=false" : ""
-            }`
+            ? (`user/twitts?id=${userId}${mediaOnly ? '&media_only=true' : ''}${type === "without_replies" ? "&include_replies=false" : ""
+              }`)
             : `twitts${type === "without_replies" ? "?include_replies=false" : ""
             }`
         }`
@@ -57,6 +57,9 @@ function TwittsList({
       refreshInterval: 10000
     }
   );
+
+  console.log(`user/twitts?id=${userId}${mediaOnly ? '&media_only=true' : ''}${type === "without_replies" ? "&include_replies=false" : ""
+    }`);
 
   useEffect(() => {
     if (twitts) {

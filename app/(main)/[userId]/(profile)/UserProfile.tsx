@@ -127,7 +127,7 @@ function UserProfile({ user, headerSubtitle, follows, sessionUser }: Props) {
               )}
               <div className="flex items-center gap-1 text-default-400">
                 <FaRegCalendarAlt size={15} />
-                <span>Joined {format(profileDetails.created_at, "MMMM yyyy")}</span>
+                <span>Joined {profileDetails.created_at ? format(profileDetails.created_at, "MMMM yyyy") : ''}</span>
               </div>
             </div>
             <div className="flex items-center gap-4">

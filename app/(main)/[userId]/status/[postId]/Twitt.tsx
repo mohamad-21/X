@@ -128,6 +128,7 @@ function Twitt({
   }, [data]);
 
   useEffect(() => {
+    document.documentElement.scrollTop = 0;
     if (!twitt.views.includes(sessionUser.id as number)) {
       handleIncreaseView();
     }

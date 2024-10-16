@@ -3,6 +3,7 @@ import LoadingSpinner from "./LoadingSpinner";
 import { auth } from "@/app/_lib/auth";
 import BottomNavigation from "./BottomNavigation";
 import Navigation from "./Navigation";
+import NotificationsUpdater from "./NotificationsUpdater";
 
 function SidebarWrapper() {
   return (
@@ -20,10 +21,12 @@ async function Sidebar() {
   return (
     <>
       <Navigation user={session?.user!} />
+      <NotificationsUpdater />
       <BottomNavigation user={session?.user!} />
     </>
   )
 }
+
 
 
 export default SidebarWrapper;

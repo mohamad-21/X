@@ -22,7 +22,6 @@ function CredentialsFlow() {
   function onTransition(callback: Function) {
     startTransition(async () => await callback());
   }
-
   useEffect(() => {
     onOpen();
   }, [onOpen])

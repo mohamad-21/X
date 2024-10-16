@@ -193,6 +193,7 @@ export async function sendVerification(email: string) {
   const code = Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
   const expiresAt = new Date();
   expiresAt.setHours(expiresAt.getHours() + 2);
+  const expiresToDatetime = expiresAt.toISOString().slice(0, 19).replace('T', ' ');
 
   try {
     await sendMail({
@@ -201,9 +202,6 @@ export async function sendVerification(email: string) {
       subject: `${code} is your verification code`,
       html: `<div style="width:100%;padding-top:4rem;display:grid">
             <div style="width:100%;max-width:400px; margin:0 auto">
-              <div style="text-align:right">
-                <img src="https://ci3.googleusercontent.com/meips/ADKq_NZv1LPCO7Dm0Tbxgo4wYzgVc98KD0XOwdh2ApRPvtcVePA5mJQh7FXBNxGjHCxLDdp2iqKqET39bJqpw3weaVsdP-zGJWNJ03cPCASbcXV1iX1pp3bCY7bzGZIUIvhYSBY9_zU=s0-d-e1-ft#https://ton.twitter.com/twitter_blue_for_business/verified-programs/x_logo.png" width="30" height="30" class="CToWUd" data-bit="iit">
-              </div>
               <h1 style="margin-bottom:14px; margin-top:27px">Confirm your email address</h1>
               <p style="margin-bottom:12px;font-size:1rem">There’s one quick step you need to complete before creating your X account. Let’s make sure this is the right email address for you — please confirm this is the right address to use for your new account.</p>
               <div style="margin-bottom:12px">
@@ -231,12 +229,12 @@ export async function sendVerification(email: string) {
     if (oldVerification[0].total_verifications > 0) {
       result = await query("update verifications set code=?,expires_at=?", [
         code,
-        expiresAt.toISOString(),
+        expiresToDatetime,
       ]);
     } else {
       result = await query(
         "insert into verifications (email, code, expires_at) values (?, ?, ?)",
-        [email, code, expiresAt.toISOString()]
+        [email, code, expiresToDatetime]
       );
     }
   } catch (err) {
@@ -341,7 +339,8 @@ export async function signupWithCredentials(
   data: CredentialsData
 ): Promise<ActionError> {
   const { name, email, password, year, month, day } = data;
-  const birthDay = new Date(`${year}-${month}-${day}`).toISOString();
+  const birthDay = new Date(`${year}-${month}-${day}`).toISOString().slice(0, 19).replace('T', ' ');
+
   const hashedPass = await bcrypt.hash(password, 10);
   const username =
     name.split(" ")[0] +

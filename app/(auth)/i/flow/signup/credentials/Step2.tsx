@@ -32,6 +32,8 @@ function Step2({ onTransition }: { onTransition: (callback: () => Promise<any>) 
     })
   }
 
+  console.log(new Date().toTimeString());
+
   return (
     <>
       <ModalHeader className="mx-auto">
@@ -39,7 +41,7 @@ function Step2({ onTransition }: { onTransition: (callback: () => Promise<any>) 
       </ModalHeader>
       <ModalBody>
         <h1 className="text-3xl font-bold">We sent you a code</h1>
-        <p className="text-[15px] text-darkgray">Enter it below to verify wyattmohammad1371017@gmail.com.</p>
+        <p className="text-[15px] text-darkgray">Enter it below to verify {signupState?.email}.</p>
         <form ref={formRef} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5 mt-4">
           <Input
             variant="bordered"

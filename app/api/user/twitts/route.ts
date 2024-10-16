@@ -10,7 +10,6 @@ export async function GET(request: NextRequest) {
     const mediaOnly = request.nextUrl.searchParams.get('media_only');
     if (!userId) return NextResponse.json({ message: 'id parameter is not set' }, { status: 400 });
     const user = await getUserById(userId, true, mediaOnly ? true : false);
-    console.log('is media only: ' + mediaOnly);
 
     if (!user) {
       return NextResponse.json({

@@ -44,6 +44,7 @@ function Twitt({
   user: UserWithFollows;
 }) {
   const [twitt, setTwitt] = useState(data);
+  const [isLiking, setIsLiking] = useState(false);
   const [followingText, setFollowingText] = useState("Following");
   const [imageSize, setSmageSize] = useState({
     width: 1,
@@ -53,15 +54,13 @@ function Twitt({
   const [message, setMessage] = useState("");
   const [pending, startTransition] = useTransition();
   const router = useRouter();
+  const { mutate } = useSWRConfig();
   const { update } = useSession();
-  const { mutate } = useSWR(
+  const { data: updatedTwitt, isLoading, isValidating } = useSWR<ITwitt & { follows: UserFollowingsAndFollowers }>(
     `/api/twitt`,
     async () => {
       const resp = await fetch(`/api/twitts/${twitt.id}`);
-      const data = await resp.json();
-      if (data) {
-        setTwitt(data);
-      }
+      const data: ITwitt & { follows: UserFollowingsAndFollowers } = await resp.json();
       return data;
     },
     {
@@ -79,28 +78,31 @@ function Twitt({
   }
 
   async function handleTwittLike() {
+    setIsLiking(true);
     const likeType = twitt.likes.some((like) => like == user.id!)
       ? ActionTypes.UNLIKE_TWITT
       : ActionTypes.LIKE_TWITT;
-    setTwitt({ ...twitt, likes: likeType == ActionTypes.LIKE_TWITT ? [...twitt.likes, user.id!] : twitt.likes.filter((like) => like != user.id!) });
-    mutate({ ...twitt, likes: likeType == ActionTypes.LIKE_TWITT ? [...twitt.likes, user.id!] : twitt.likes.filter((like) => like != user.id!) }, false);
-    await likeTwitt({ twitt, user_id: user.id! });
+    setTwitt({ ...twitt, likes: likeType == ActionTypes.LIKE_TWITT ? [...twitt.likes, user.id] : twitt.likes.filter((like) => like != user.id) });
+
+    await likeTwitt({ twitt, user_id: user.id });
+    mutate('/api/twitt');
+    setIsLiking(false);
   }
 
   async function hanldeFollow() {
     setTimeout(() => {
-      setTwitt(prev => ({ ...prev, follows: { ...prev.follows, followers: [...prev.follows.followers, user?.id as number] } }));
+      setTwitt(prev => ({ ...prev, follows: { ...prev.follows, followers: [...prev.follows.followers, user.id as number] } }));
     }, 600);
     update('trigger');
-    await follow(user?.id, twitt.user_id);
+    await follow(user.id, twitt.user_id);
   }
 
   async function hanldeUnfollow() {
     setTimeout(() => {
-      setTwitt(prev => ({ ...prev, follows: { ...prev.follows, followers: prev.follows.followers.filter(follower => follower != user?.id) } }));
+      setTwitt(prev => ({ ...prev, follows: { ...prev.follows, followers: prev.follows.followers.filter(follower => follower != user.id) } }));
     }, 600);
     update('trigger');
-    await unFollow(user?.id!, twitt.user_id);
+    await unFollow(user.id, twitt.user_id);
   }
 
   async function handleMenuAction(key: Key) {
@@ -118,6 +120,12 @@ function Twitt({
       router.replace("/home");
     });
   }
+
+  useEffect(() => {
+    if (!isLiking && updatedTwitt && !isLoading && !isValidating) {
+      setTwitt(updatedTwitt);
+    }
+  }, [updatedTwitt, isLiking, isLoading, isValidating]);
 
   useEffect(() => {
     setTwitt(data);
@@ -157,9 +165,9 @@ function Twitt({
             />
           </div>
           <div>
-            {twitt.user_id != user?.id && (
+            {twitt.user_id != user.id && (
               <>
-                {twitt.follows.followers.some(follower => follower == user?.id) ? (
+                {twitt.follows.followers.some(follower => follower == user.id) ? (
                   <Button
                     variant="bordered"
                     className="font-bold text-base hover:border-danger/75 hover:bg-danger/20 hover:text-danger"

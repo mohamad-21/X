@@ -27,8 +27,8 @@ function TwittsList({
   const [user, setUser] = useState(initialUser);
   const dispatch = useDispatch();
   const [twitts, setTwitts] = useState(allTwitts);
-  const [likedTwitts, setLikedTwitts] = useState<ITwitt[]>([]);
-  useSWR<ITwitt[]>(
+  const [isLiking, setIsLiking] = useState(false);
+  const { data: updatedTwitts, isLoading, isValidating } = useSWR<ITwitt[]>(
     `${type === "comments"
       ? "/api/twitts/comments"
       : (
@@ -49,27 +49,10 @@ function TwittsList({
         }`
       );
       const data: ITwitt[] = await resp.json();
-      if (data) {
-        if (likedTwitts) {
-          setTwitts(data.map((twitt, idx) => {
-            if (twitt.id === likedTwitts[idx].id) {
-              let allLikes = [...twitt.likes, ...likedTwitts[idx].likes];
-              allLikes = allLikes.filter((like, idx) => allLikes.indexOf(like) !== idx);
-              twitt = {
-                ...twitt,
-                likes: allLikes
-              }
-            }
-            return twitt;
-          }));
-        } else {
-          setTwitts(data);
-        }
-      }
       return data;
     },
     {
-      refreshInterval: 2000,
+      refreshInterval: 7000,
     }
   );
   useSWR<UserWithFollows>('/api/user/details', async () => {
@@ -82,6 +65,12 @@ function TwittsList({
   }, {
     refreshInterval: 10000
   });
+
+  useEffect(() => {
+    if (!isLiking && updatedTwitts && !isValidating && !isLoading) {
+      setTwitts(updatedTwitts);
+    }
+  }, [isLiking, updatedTwitts, isLoading, isValidating]);
 
   useEffect(() => {
     if (twitts) {
@@ -106,7 +95,7 @@ function TwittsList({
                     user={user}
                     twitt={twitt}
                     setTwitts={setTwitts}
-                    setLikedTwitts={setLikedTwitts}
+                    setIsLiking={setIsLiking}
                     twitts={twitts}
                     mediaOnly={mediaOnly}
                   />
@@ -123,7 +112,7 @@ function TwittsList({
               key={twitt.id}
               twitt={twitt}
               setTwitts={setTwitts}
-              setLikedTwitts={setLikedTwitts}
+              setIsLiking={setIsLiking}
               twitts={twitts}
               mediaOnly={mediaOnly}
             />

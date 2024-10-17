@@ -42,7 +42,7 @@ type TwittProps = {
   user: UserWithFollows;
   setTwitts: React.Dispatch<React.SetStateAction<ITwitt[]>>;
   twitts: ITwitt[];
-  setLikedTwitts: React.Dispatch<React.SetStateAction<ITwitt[]>>;
+  setIsLiking: React.Dispatch<React.SetStateAction<boolean>>;
   mediaOnly?: boolean;
 };
 
@@ -51,7 +51,7 @@ function Twitt({
   user,
   setTwitts,
   twitts,
-  setLikedTwitts,
+  setIsLiking,
   mediaOnly,
 }: TwittProps) {
   const [imageSize, setSmageSize] = useState({
@@ -81,10 +81,10 @@ function Twitt({
   }
 
   async function handleTwittLike() {
+    setIsLiking(true);
     const likeType = twitt.likes.some((like) => like == user.id!)
       ? ActionTypes.UNLIKE_TWITT
       : ActionTypes.LIKE_TWITT;
-
     setTwitts(twitts.map((state) => {
       if (twitt.id === state.id) {
         state = {
@@ -94,8 +94,13 @@ function Twitt({
       }
       return state;
     }));
-    setLikedTwitts(prev => [...prev, twitt]);
     await likeTwitt({ twitt, user_id: user.id! });
+    mutate('/api/twitts');
+    mutate('/api/twitts/comments');
+    mutate('/api/user/twitts');
+    setTimeout(() => {
+      setIsLiking(false);
+    }, 1500);
   }
 
   function handleTwittClick(e: React.MouseEvent<any>) {

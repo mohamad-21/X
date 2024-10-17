@@ -20,6 +20,7 @@ import {
   Verification,
 } from "./definitions";
 import { sendMail } from "./sendMail";
+import { redirect } from "next/navigation";
 
 interface CredentialsData extends SignupData, PasswordData { }
 
@@ -57,6 +58,7 @@ export async function getAlltwitts({
 
 export async function logOut() {
   await signOut();
+  redirect('/');
 }
 
 export async function getTwittById(
@@ -83,21 +85,25 @@ export async function getTwittComments(twitt_id: number | string) {
 export async function getUserByUsername(
   username: string,
   twittsWithReply: boolean = false
-): Promise<(User & { twitts: ITwitt[] }) | null> {
+): Promise<(User & { twitts: ITwitt[], follows: UserFollowingsAndFollowers }) | null> {
   const result = await query<User[]>("select * from users where username = ?", [
     username,
   ]);
 
   if (result.length < 1) return null;
-  const userTwitts = await getAlltwitts({
-    byUsername: true,
-    username,
-    with_reply: twittsWithReply,
-  });
+  const [userTwitts, follows] = await Promise.all([
+    getAlltwitts({
+      byUsername: true,
+      username,
+      with_reply: twittsWithReply,
+    }),
+    getUserFollowersAndFollowings(result[0].id)
+  ])
 
   return {
     ...result[0],
     twitts: userTwitts,
+    follows
   };
 }
 
@@ -123,7 +129,7 @@ export async function getUserById(
 
 export async function getUserFollowersAndFollowings(
   user_id: number | string
-): Promise<UserFollowingsAndFollowers> {
+) {
   const result = await query<UserFollowingsAndFollowersTable[]>(
     "select * from follows where following_id = ? or follower_id = ?",
     [user_id, user_id]

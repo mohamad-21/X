@@ -19,9 +19,6 @@ function Notifications({ notif, user }: { notif: INotification, user: SessionUse
 
   useEffect(() => {
     mutate('/api/user/notifications');
-    (async () => {
-      await readNotifications({ user });
-    })()
   }, []);
 
   function handleNotifClick(e: React.MouseEvent<HTMLDivElement>) {

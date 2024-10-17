@@ -37,7 +37,7 @@ import { LuImage } from "react-icons/lu";
 import { MdGif } from "react-icons/md";
 import { useSWRConfig } from "swr";
 import Alert from "@/app/_ui/Alert";
-import { uploadFiles } from "@/app/_utils/uploadthing";
+import { uploadFiles } from "@/app/_lib/uploadthing";
 
 type Props = {
   user: User;

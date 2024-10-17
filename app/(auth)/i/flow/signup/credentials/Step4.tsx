@@ -7,7 +7,7 @@ import { updateProfilePhoto } from "@/app/_lib/actions";
 import { useAppDispatch, useAppSelector } from "@/app/_lib/hooks";
 import { setSignupData } from "@/app/_lib/slices/userSlice";
 import { useSession } from "next-auth/react";
-import { uploadFiles } from "@/app/_utils/uploadthing";
+import { uploadFiles } from "@/app/_lib/uploadthing";
 
 function Step4({ onTransition }: { onTransition: (callback: () => Promise<any>) => void }) {
   const [error, setError] = useState<string | null>(null);

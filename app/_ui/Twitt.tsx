@@ -30,7 +30,7 @@ import TwittSettings from "./TwittSettings";
 import Alert from "./Alert";
 import LoadingSpinner from "./LoadingSpinner";
 import { optimizedText } from "@/app/_utils/optimizedText";
-import { useMutateAll } from "../_utils/swr";
+import { useMutateAll } from "../_lib/swr";
 
 export const ActionTypes = {
   INCREASE_VIEW: "INCREASE_VIEW",
@@ -174,7 +174,7 @@ function Twitt({
           </Link>
           <div className="flex flex-col gap-3 sm:ml-0 -ml-[7px] to-twitt">
             <div className="to-twitt">
-              <div className="flex items-center justify-between relative">
+              <div className="flex items-center justify-between relative to-twitt">
                 <div className="flex items-start whitespace-nowrap to-twitt truncate overflow-hidden gap-1">
                   <Link
                     href={`/${twitt.username}`}

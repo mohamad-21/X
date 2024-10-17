@@ -61,11 +61,8 @@ export const authConfig: NextAuthConfig = {
   ],
   callbacks: {
     authorized: ({ request, auth }) => {
-      if (request.nextUrl.pathname === '/home' && !auth?.user) {
+      if (request.nextUrl.pathname !== '/' && !auth?.user) {
         return NextResponse.redirect(new URL('/', request.url));
-      }
-      if (request.nextUrl.pathname === '/' && auth?.user) {
-        return NextResponse.redirect(new URL('/home', request.url));
       }
       const requestHeaders = new Headers(request.headers);
       requestHeaders.set('x-pathname', request.nextUrl.pathname);

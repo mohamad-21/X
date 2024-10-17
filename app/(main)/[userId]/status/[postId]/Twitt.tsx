@@ -10,8 +10,8 @@ import {
 } from "@/app/_lib/actions";
 import {
   ITwitt,
-  SessionUser,
   UserFollowingsAndFollowers,
+  UserWithFollows,
 } from "@/app/_lib/definitions";
 import CreatePost from "@/app/_ui/createPost/CreatePost";
 import { ActionTypes } from "@/app/_ui/Twitt";
@@ -38,10 +38,10 @@ const numeral = require("numeral");
 
 function Twitt({
   data,
-  sessionUser,
+  user,
 }: {
   data: ITwitt & { follows: UserFollowingsAndFollowers };
-  sessionUser: SessionUser;
+  user: UserWithFollows;
 }) {
   const [twitt, setTwitt] = useState(data);
   const [followingText, setFollowingText] = useState("Following");
@@ -69,42 +69,42 @@ function Twitt({
   );
 
   async function handleIncreaseView() {
-    if (twitt.views.some(view => view == sessionUser.id)) return;
+    if (twitt.views.some(view => view == user.id)) return;
     setTwitt((prev) => ({
       ...prev,
-      views: [...prev.views, sessionUser.id],
+      views: [...prev.views, user.id],
     }));
-    await increaseTwittView(twitt.id, sessionUser.id!);
+    await increaseTwittView(twitt.id, user.id!);
   }
 
   async function handleTwittLike() {
-    const likeType = twitt.likes.some((like) => like == sessionUser.id!)
+    const likeType = twitt.likes.some((like) => like == user.id!)
       ? ActionTypes.UNLIKE_TWITT
       : ActionTypes.LIKE_TWITT;
     setTwitt((prev) => ({
       ...prev,
       likes:
         likeType === "LIKE_TWITT"
-          ? [...prev.likes, sessionUser.id]
-          : prev.likes.filter((like) => like != sessionUser.id),
+          ? [...prev.likes, user.id]
+          : prev.likes.filter((like) => like != user.id),
     }));
-    await likeTwitt({ twitt, user_id: sessionUser.id! });
+    await likeTwitt({ twitt, user_id: user.id! });
   }
 
   async function hanldeFollow() {
     setTimeout(() => {
-      setTwitt(prev => ({ ...prev, follows: { ...prev.follows, followers: [...prev.follows.followers, sessionUser?.id as number] } }));
+      setTwitt(prev => ({ ...prev, follows: { ...prev.follows, followers: [...prev.follows.followers, user?.id as number] } }));
     }, 600);
     update('trigger');
-    await follow(sessionUser?.id, twitt.user_id);
+    await follow(user?.id, twitt.user_id);
   }
 
   async function hanldeUnfollow() {
     setTimeout(() => {
-      setTwitt(prev => ({ ...prev, follows: { ...prev.follows, followers: prev.follows.followers.filter(follower => follower != sessionUser?.id) } }));
+      setTwitt(prev => ({ ...prev, follows: { ...prev.follows, followers: prev.follows.followers.filter(follower => follower != user?.id) } }));
     }, 600);
     update('trigger');
-    await unFollow(sessionUser?.id!, twitt.user_id);
+    await unFollow(user?.id!, twitt.user_id);
   }
 
   async function handleMenuAction(key: Key) {
@@ -129,7 +129,7 @@ function Twitt({
 
   useEffect(() => {
     document.documentElement.scrollTop = 0;
-    if (!twitt.views.includes(sessionUser.id as number)) {
+    if (!twitt.views.includes(user.id as number)) {
       handleIncreaseView();
     }
   }, []);
@@ -156,14 +156,14 @@ function Twitt({
             </div>
             <TwittSettings
               twitt={twitt}
-              user={sessionUser}
+              user={user}
               onMenuAction={handleMenuAction}
             />
           </div>
           <div>
-            {twitt.user_id != sessionUser?.id && (
+            {twitt.user_id != user?.id && (
               <>
-                {twitt.follows.followers.some(follower => follower == sessionUser?.id) ? (
+                {twitt.follows.followers.some(follower => follower == user?.id) ? (
                   <Button
                     variant="bordered"
                     className="font-bold text-base hover:border-danger/75 hover:bg-danger/20 hover:text-danger"
@@ -238,7 +238,7 @@ function Twitt({
         </ul>
         <TwittActions
           twitt={twitt}
-          user={sessionUser}
+          user={user}
           onCommentsClick={() => {
             router.push(`/post?replyto=${twitt.id}`);
           }}
@@ -249,7 +249,7 @@ function Twitt({
           <CreatePost
             type="reply"
             noPadding
-            user={sessionUser}
+            user={user}
             rows={1}
             showOnClick
             initialReplyTo={twitt}

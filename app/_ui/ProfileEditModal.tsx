@@ -12,7 +12,7 @@ import { updateUserInfo } from "@/app/_lib/actions";
 import LoadingSpinner from "./LoadingSpinner";
 import Alert from "./Alert";
 import { useSession } from "next-auth/react";
-import { uploadFiles } from "../_utils/uploadthing";
+import { uploadFiles } from "../_lib/uploadthing";
 
 type UserInfo = {
   name: string;

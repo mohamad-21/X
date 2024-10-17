@@ -28,7 +28,8 @@ function TwittsList({
 }: TwittsListProps) {
   const [user, setUser] = useState(initialUser);
   const dispatch = useDispatch();
-  const { data: twitts, mutate: mutateTwitts } = useSWR<ITwitt[]>(
+  const [twitts, setTwitts] = useState(allTwitts);
+  const { mutate: mutateTwitts } = useSWR<ITwitt[]>(
     `${type === "comments"
       ? "/api/twitts/comments"
       : (
@@ -49,11 +50,13 @@ function TwittsList({
         }`
       );
       const data = await resp.json();
+      if (data) {
+        setTwitts(data);
+      }
       return data;
     },
     {
       refreshInterval: 7000,
-      fallbackData: allTwitts
     }
   );
   useSWR<UserWithFollows>('/api/user/details', async () => {

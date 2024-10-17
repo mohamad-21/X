@@ -12,14 +12,11 @@ export async function generateMetadata({ params }: { params: { userId: string } 
 }
 
 async function Page({ params }: { params: { userId: string } }) {
-  const [user, session] = await Promise.all([
-    getUserByUsername(params.userId),
-    auth()
-  ]);
+  const user = await getUserByUsername(params.userId);
   if (!user) notFound();
 
   return (
-    <TwittsList session={session} allTwitts={user.twitts} userId={user.id} type="without_replies" />
+    <TwittsList user={user} allTwitts={user.twitts} userId={user.id} type="without_replies" />
   )
 }
 

@@ -28,7 +28,7 @@ function TwittActions({ twitt, user, onCommentsClick, onRetwitt, onLike, classNa
   }, [showUnavailable]);
 
   return (
-    <div className={`flex items-center gap-4 justify-between ${className}`}>
+    <div className={`flex items-center gap-4 justify-between to-twitt ${className}`}>
       <Button onClick={onCommentsClick} variant="bordered" className="flex items-center text-default-400 hover:bg-transparent hover:text-primary border-none group gap-0 transition-all duration-150 min-w-0 px-0">
         <div className="rounded-full py-1.5 px-2 group-hover:bg-primary/20">
           <FaRegComment size={17} className="relative" />

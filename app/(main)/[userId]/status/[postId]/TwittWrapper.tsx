@@ -8,6 +8,7 @@ import Twitt from "./Twitt";
 import { auth } from "@/app/_lib/auth";
 import LoadingSpinner from "@/app/_ui/LoadingSpinner";
 import TwittCommentsWrapper from "./TwittCommentsWrapper";
+import { getUserDetailsFromAPI } from "@/app/_lib/helpers";
 
 async function TwittWrapper({ postId }: { postId: string }) {
   const [session, twitt] = await Promise.all([
@@ -16,12 +17,15 @@ async function TwittWrapper({ postId }: { postId: string }) {
   ]);
 
   if (!twitt) notFound();
-  const follows = await getUserFollowersAndFollowings(twitt.user_id);
-  const twittWithFollows = { ...twitt, follows };
+  const [twittUserFollows, user] = await Promise.all([
+    getUserFollowersAndFollowings(twitt.user_id),
+    getUserDetailsFromAPI(session?.user.id!)
+  ]);
+  const twittWithFollows = { ...twitt, follows: twittUserFollows };
 
   return (
     <div className="mt-3">
-      <Twitt data={twittWithFollows} sessionUser={session?.user!} />
+      <Twitt data={twittWithFollows} user={user} />
       {twitt.comments.length > 0 && (
         <Suspense fallback={<LoadingSpinner />}>
           <TwittCommentsWrapper postId={postId} />

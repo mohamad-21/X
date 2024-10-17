@@ -2,6 +2,7 @@ import React from "react";
 import CreatePost from "@/app/_ui/createPost/CreatePost";
 import { auth } from "@/app/_lib/auth";
 import { getTwittById } from "@/app/_lib/actions";
+import { getUserDetailsFromAPI } from "@/app/_lib/helpers";
 
 async function CreatePostWrapper({ replyTo }: { replyTo?: number | string | null }) {
   const [session, twitt] = await Promise.all([
@@ -11,9 +12,11 @@ async function CreatePostWrapper({ replyTo }: { replyTo?: number | string | null
 
   if (!session?.user) return;
 
+  const user = await getUserDetailsFromAPI(session.user.id);
+
   return (
     <CreatePost
-      user={session.user}
+      user={user}
       asModal
       initialReplyTo={twitt}
     />

@@ -73,6 +73,17 @@ export async function getTwittById(
   return twitt;
 }
 
+export async function getTwittsByIds(
+  ids: (number | string)[]
+) {
+  const twitts = await query<ITwitt[]>(
+    "select twitts.id, twitts.text, twitts.media, twitts.created_at, twitts.media_type, twitts.likes, twitts.views, twitts.reply_to, twitts.comments, twitts.retwitts, users.id as user_id, users.username, users.name, users.profile as user_profile from twitts join users on twitts.user_id = users.id where twitts.id in(?) order by twitts.id desc",
+    [ids.join(',')]
+  );
+
+  return twitts;
+}
+
 export async function getTwittComments(twitt_id: number | string) {
   const comments = await query<ITwitt[]>(
     "select twitts.id, twitts.text, twitts.media, twitts.created_at, twitts.media_type, twitts.likes, twitts.views, twitts.reply_to, twitts.retwitts, twitts.comments, users.id as user_id, users.username, users.name, users.profile as user_profile from twitts join users on twitts.user_id = users.id where twitts.reply_to = ? order by twitts.id desc",
@@ -651,6 +662,10 @@ export async function readNotifications({
     userSession = session.user;
   }
   if (!userSession) return;
+  const result = await query<{ total_notifs: number }[]>("select count(id) as total_notifs from notifications");
+  if (result[0].total_notifs > 7) {
+    await query("delete from notifications order by id desc limit 1")
+  }
   await query(`update notifications set is_viewed=1 where user_id = ?`, [userSession.id]);
 }
 
@@ -661,6 +676,5 @@ export async function pushNotification({ user_id, opposite_id, type, place_id, t
   place_id?: number,
   text?: string,
 }) {
-
   await query("insert into notifications(user_id, opposite_id, type, place_id, text) values(?,?,?,?,?)", [user_id, opposite_id || null, type || null, place_id || null, text || null]);
 }

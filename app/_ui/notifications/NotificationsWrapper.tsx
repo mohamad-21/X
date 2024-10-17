@@ -1,4 +1,4 @@
-import { getTwittById, getUserNotifications, readNotifications } from "@/app/_lib/actions";
+import { getTwittById, getTwittsByIds, getUserNotifications, readNotifications } from "@/app/_lib/actions";
 import { auth } from "@/app/_lib/auth";
 import Notifications from "./Notifications";
 
@@ -10,12 +10,19 @@ async function NotificationsWrapper() {
     readNotifications({ user: session.user })
   ])
 
-  userNotifications = await Promise.all(userNotifications.map(async notif => {
-    if (notif.type === 'like' && notif.place_id) {
-      notif.twitt = await getTwittById(notif.place_id);
-    }
-    return notif;
-  }));
+  const placeIds = userNotifications.filter(notif => notif.type === 'like' && notif.place_id)
+    .map(notif => notif.place_id);
+
+  if (placeIds.length) {
+    const twittsData = await getTwittsByIds(placeIds as (number | string)[]);
+
+    userNotifications = userNotifications.map(notif => {
+      if (notif.type === 'like' && notif.place_id) {
+        notif.twitt = twittsData.find(tweet => tweet.id === notif.place_id);
+      }
+      return notif;
+    })
+  }
 
   return (
     <ul>

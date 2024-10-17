@@ -1,4 +1,4 @@
-import { ITwitt, SessionUser } from "@/app/_lib/definitions";
+import { ITwitt, SessionUser, UserWithFollows } from "@/app/_lib/definitions";
 import { Button } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { FaHeart, FaRegComment, FaRegHeart } from "react-icons/fa";
@@ -11,7 +11,7 @@ const numeral = require('numeral');
 
 type Props = {
   twitt: ITwitt,
-  user: SessionUser,
+  user: UserWithFollows,
   onCommentsClick?: () => any,
   onRetwitt?: () => any,
   onLike?: () => any,

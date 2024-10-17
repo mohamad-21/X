@@ -577,9 +577,8 @@ export async function follow(
       follower_id,
       following_id,
     ]),
-    // pushNotification({ user_id: following_id as number, opposite_id: follower_id as number, type: "follow" })
+    pushNotification({ user_id: following_id as number, opposite_id: follower_id as number, type: "follow" })
   ]);
-
 }
 
 export async function unFollow(

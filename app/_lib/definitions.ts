@@ -42,7 +42,9 @@ export interface UserFollowingsAndFollowers {
   followers: number[],
   followings: number[]
 }
-
+export interface UserWithFollows extends User {
+  follows: UserFollowingsAndFollowers
+}
 
 export type SessionUser = {
   id: string | number,

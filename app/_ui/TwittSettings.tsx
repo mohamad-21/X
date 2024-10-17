@@ -13,7 +13,7 @@ import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { LuUserPlus } from "react-icons/lu";
 import { MdBlock, MdOutlinePushPin } from "react-icons/md";
 import { RiPagesLine } from "react-icons/ri";
-import { ITwitt, SessionUser } from "@/app/_lib/definitions";
+import { ITwitt, SessionUser, User, UserWithFollows } from "@/app/_lib/definitions";
 
 function TwittSettings({
   onMenuAction,
@@ -22,7 +22,7 @@ function TwittSettings({
 }: {
   onMenuAction: (e: Key) => void;
   twitt: ITwitt;
-  user: SessionUser;
+  user: UserWithFollows;
 }) {
   return (
     <Dropdown>

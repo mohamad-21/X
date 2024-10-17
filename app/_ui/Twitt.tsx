@@ -5,7 +5,7 @@ import {
   likeTwitt,
   unFollow,
 } from "@/app/_lib/actions";
-import { ITwitt, SessionUser } from "@/app/_lib/definitions";
+import { ITwitt, SessionUser, User, UserWithFollows } from "@/app/_lib/definitions";
 import { useAppDispatch, useIsVisible } from "@/app/_lib/hooks";
 import { MediaPlayer, MediaProvider } from "@vidstack/react";
 import {
@@ -23,13 +23,14 @@ import React, {
   useState,
   useTransition,
 } from "react";
-import { useSWRConfig } from "swr";
+import { KeyedMutator, useSWRConfig } from "swr";
 import DeleteConfirm from "./DeleteConfirm";
 import TwittActions from "./TwittActions";
 import TwittSettings from "./TwittSettings";
 import Alert from "./Alert";
 import LoadingSpinner from "./LoadingSpinner";
 import { optimizedText } from "@/app/_utils/optimizedText";
+import { useMutateAll } from "../_utils/swr";
 
 export const ActionTypes = {
   INCREASE_VIEW: "INCREASE_VIEW",
@@ -39,21 +40,19 @@ export const ActionTypes = {
 
 type TwittProps = {
   twitt: ITwitt;
-  user: SessionUser;
-  setTwitts: React.Dispatch<React.SetStateAction<ITwitt[]>>;
+  user: UserWithFollows;
+  mutateTwitts: KeyedMutator<ITwitt[]>;
+  twitts: ITwitt[];
   mediaOnly?: boolean;
 };
 
 function Twitt({
-  twitt: initialTwitt,
+  twitt,
   user,
-  setTwitts,
+  mutateTwitts,
+  twitts,
   mediaOnly,
 }: TwittProps) {
-  const [twitt, optimisticDispatch] = useOptimistic<
-    ITwitt,
-    { type: string; payload: any }
-  >(initialTwitt, twittReducer);
   const [imageSize, setSmageSize] = useState({
     width: 0,
     height: 0,
@@ -64,16 +63,19 @@ function Twitt({
   const isVisible = useIsVisible(twittRef);
   const router = useRouter();
   const { mutate } = useSWRConfig();
+  const mutateAll = useMutateAll();
   const [pending, startTransition] = useTransition();
 
   async function handleIncreaseView() {
-    optimisticDispatch({
-      type: ActionTypes.INCREASE_VIEW,
-      payload: {
-        id: twitt.id,
-        user_id: user.id,
-      },
-    });
+    mutateTwitts(twitts.map(state => {
+      if (state.id == twitt.id) {
+        return {
+          ...state,
+          views: [...state.views, user.id]
+        }
+      }
+      return state;
+    }))
     await increaseTwittView(twitt.id, user.id!);
   }
 
@@ -81,58 +83,17 @@ function Twitt({
     const likeType = twitt.likes.some((like) => like == user.id!)
       ? ActionTypes.UNLIKE_TWITT
       : ActionTypes.LIKE_TWITT;
-    optimisticDispatch({
-      type: likeType,
-      payload: {
-        id: twitt.id,
-        user_id: user.id,
-      },
-    });
-    await likeTwitt({ twitt, user_id: user.id! });
-    setTwitts((state) =>
-      state.map((state) => {
-        if (twitt.id === state.id) {
-          if (likeType === ActionTypes.LIKE_TWITT) {
-            return {
-              ...state,
-              likes: [...state.likes, user.id!],
-            };
-          } else if (likeType === ActionTypes.UNLIKE_TWITT) {
-            return {
-              ...state,
-              likes: state.likes.filter((like) => like != user.id!),
-            };
-          }
-        }
-        return state;
-      })
-    );
-  }
 
-  function twittReducer(state: ITwitt, action: { type: string; payload: any }) {
-    switch (action.type) {
-      case ActionTypes.INCREASE_VIEW: {
-        return {
+    mutateTwitts(twitts.map((state) => {
+      if (twitt.id === state.id) {
+        state = {
           ...state,
-          views: [...state.views, action.payload.user_id],
+          likes: likeType == ActionTypes.LIKE_TWITT ? [...state.likes, user.id!] : state.likes.filter((like) => like != user.id!),
         };
       }
-      case ActionTypes.LIKE_TWITT: {
-        return {
-          ...state,
-          likes: [...state.likes, action.payload.user_id],
-        };
-      }
-      case ActionTypes.UNLIKE_TWITT: {
-        return {
-          ...state,
-          likes: state.likes.filter((like) => like != action.payload.user_id),
-        };
-      }
-      default: {
-        return state;
-      }
-    }
+      return state;
+    }), false);
+    await likeTwitt({ twitt, user_id: user.id! });
   }
 
   function handleTwittClick(e: React.MouseEvent<any>) {
@@ -148,9 +109,11 @@ function Twitt({
       setShowDeleteConfirm(true);
     } else if (key === "follow") {
       await follow(user.id, twitt.user_id);
+      mutate('/api/user/details');
       setMessage(`You're now following @${twitt.username}`);
     } else if (key === "unfollow") {
       await unFollow(user.id, twitt.user_id);
+      mutate('/api/user/details');
       setMessage(`@${twitt.username} now is not in your followings`);
     } else {
       setMessage("This action is not available for now.");
@@ -160,12 +123,10 @@ function Twitt({
   async function handleTwittDelete() {
     startTransition(async () => {
       await deleteTwitt(twitt.id);
-      setTwitts((prev) => prev.filter((t) => t.id !== twitt.id));
-      mutate("/api/twitts");
-      mutate("/api/twitts/comments");
-      mutate("/api/user/twitts");
+      // setTwitts((prev) => prev.filter((t) => t.id !== twitt.id));
       setShowDeleteConfirm(false);
     });
+    mutateAll();
   }
 
   useEffect(() => {
@@ -245,7 +206,7 @@ function Twitt({
                   className="whitespace-pre-wrap -mt-1 break-words to-twitt"
                   dir={/[\u0600-\u06FF]/.test(twitt.text) ? "rtl" : "ltr"}
                   dangerouslySetInnerHTML={{
-                    __html: twitt.text,
+                    __html: optimizedText(twitt.text),
                   }}
                 />
               )}

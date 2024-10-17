@@ -10,7 +10,7 @@ import { Card, Tab, Tabs } from "@nextui-org/react";
 import { format } from "date-fns";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import { FaLocationDot } from "react-icons/fa6";

@@ -1,7 +1,7 @@
 "use client";
 
 import { addTwitt } from "@/app/_lib/actions";
-import { AddTwitt, ITwitt, SessionUser } from "@/app/_lib/definitions";
+import { AddTwitt, ITwitt, SessionUser, User } from "@/app/_lib/definitions";
 import { useAppSelector, useModalProps } from "@/app/_lib/hooks";
 import LoadingSpinner from "@/app/_ui/LoadingSpinner";
 import { GiphyFetch, ICategory } from "@giphy/js-fetch-api";
@@ -40,7 +40,7 @@ import Alert from "@/app/_ui/Alert";
 import { uploadFiles } from "@/app/_utils/uploadthing";
 
 type Props = {
-  user: SessionUser;
+  user: User;
   asModal?: boolean;
   rows?: number;
   noPadding?: boolean;
@@ -318,7 +318,7 @@ function CreatePost({
               <img
                 width={44}
                 height={44}
-                src={user.image}
+                src={user.profile}
                 alt={user.name}
                 className="flex-shrink-0 w-11 h-11 rounded-full object-cover"
               />
@@ -464,7 +464,7 @@ function CreatePost({
         >
           <div className="flex gap-1">
             <img
-              src={user.image}
+              src={user.profile}
               alt={user.name}
               className="w-[44px] h-[44px] flex-shrink-0 rounded-full object-cover"
             />

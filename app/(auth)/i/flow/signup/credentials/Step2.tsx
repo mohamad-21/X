@@ -32,8 +32,6 @@ function Step2({ onTransition }: { onTransition: (callback: () => Promise<any>) 
     })
   }
 
-  console.log(new Date().toTimeString());
-
   return (
     <>
       <ModalHeader className="mx-auto">

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ITwitt } from "@/app/_lib/definitions";
+import { ITwitt, User, UserWithFollows } from "@/app/_lib/definitions";
 import { setTwitts as setTwittsSlice } from "@/app/_lib/slices/appSlice";
 import { Session } from "next-auth";
 import { useEffect, useState } from "react";
@@ -10,7 +10,7 @@ import useSWR from "swr";
 import Twitt from "./Twitt";
 
 type TwittsListProps = {
-  session: Session | null;
+  user: UserWithFollows;
   allTwitts: ITwitt[];
   mediaOnly?: boolean;
   userId?: number | string;
@@ -19,16 +19,16 @@ type TwittsListProps = {
 };
 
 function TwittsList({
-  session,
+  user: initialUser,
   allTwitts,
   mediaOnly = false,
   userId,
   twittId,
   type,
 }: TwittsListProps) {
-  const [twitts, setTwitts] = useState(allTwitts);
+  const [user, setUser] = useState(initialUser);
   const dispatch = useDispatch();
-  useSWR<ITwitt[]>(
+  const { data: twitts, mutate: mutateTwitts } = useSWR<ITwitt[]>(
     `${type === "comments"
       ? "/api/twitts/comments"
       : (
@@ -49,23 +49,31 @@ function TwittsList({
         }`
       );
       const data = await resp.json();
-      setTwitts(data);
       return data;
     },
     {
-      fallbackData: allTwitts,
-      refreshInterval: 10000
+      refreshInterval: 7000,
+      fallbackData: allTwitts
     }
   );
-
-  console.log(`user/twitts?id=${userId}${mediaOnly ? '&media_only=true' : ''}${type === "without_replies" ? "&include_replies=false" : ""
-    }`);
+  useSWR<UserWithFollows>('/api/user/details', async () => {
+    const resp = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/user/details?id=${user.id}`);
+    const data = await resp.json();
+    if (data) {
+      setUser(data);
+    }
+    return data;
+  }, {
+    refreshInterval: 10000
+  });
 
   useEffect(() => {
     if (twitts) {
       dispatch(setTwittsSlice(twitts));
     }
   }, [twitts]);
+
+  if (!twitts?.length) return;
 
   const groupedTwitts = [];
   for (let i = 0; i < twitts.length; i += 3) {
@@ -81,9 +89,10 @@ function TwittsList({
               {group.map((twitt) => (
                 <div className="w-[33.33%]" key={twitt.id}>
                   <Twitt
-                    user={session?.user!}
+                    user={user}
                     twitt={twitt}
-                    setTwitts={setTwitts}
+                    mutateTwitts={mutateTwitts}
+                    twitts={twitts}
                     mediaOnly={mediaOnly}
                   />
                 </div>
@@ -95,10 +104,11 @@ function TwittsList({
         <>
           {twitts?.map((twitt) => (
             <Twitt
-              user={session?.user!}
+              user={user}
               key={twitt.id}
               twitt={twitt}
-              setTwitts={setTwitts}
+              mutateTwitts={mutateTwitts}
+              twitts={twitts}
               mediaOnly={mediaOnly}
             />
           ))}

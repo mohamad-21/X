@@ -54,7 +54,7 @@ function Twitt({
   const [pending, startTransition] = useTransition();
   const router = useRouter();
   const { update } = useSession();
-  useSWR(
+  const { mutate } = useSWR(
     `/api/twitt`,
     async () => {
       const resp = await fetch(`/api/twitts/${twitt.id}`);
@@ -62,6 +62,7 @@ function Twitt({
       if (data) {
         setTwitt(data);
       }
+      return data;
     },
     {
       refreshInterval: 10000,
@@ -81,13 +82,8 @@ function Twitt({
     const likeType = twitt.likes.some((like) => like == user.id!)
       ? ActionTypes.UNLIKE_TWITT
       : ActionTypes.LIKE_TWITT;
-    setTwitt((prev) => ({
-      ...prev,
-      likes:
-        likeType === "LIKE_TWITT"
-          ? [...prev.likes, user.id]
-          : prev.likes.filter((like) => like != user.id),
-    }));
+    setTwitt({ ...twitt, likes: likeType == ActionTypes.LIKE_TWITT ? [...twitt.likes, user.id!] : twitt.likes.filter((like) => like != user.id!) });
+    mutate({ ...twitt, likes: likeType == ActionTypes.LIKE_TWITT ? [...twitt.likes, user.id!] : twitt.likes.filter((like) => like != user.id!) }, false);
     await likeTwitt({ twitt, user_id: user.id! });
   }
 

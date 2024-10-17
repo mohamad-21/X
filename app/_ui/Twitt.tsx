@@ -5,8 +5,9 @@ import {
   likeTwitt,
   unFollow,
 } from "@/app/_lib/actions";
-import { ITwitt, SessionUser, User, UserWithFollows } from "@/app/_lib/definitions";
-import { useAppDispatch, useIsVisible } from "@/app/_lib/hooks";
+import { ITwitt, UserWithFollows } from "@/app/_lib/definitions";
+import { useIsVisible } from "@/app/_lib/hooks";
+import { optimizedText } from "@/app/_utils/optimizedText";
 import { MediaPlayer, MediaProvider } from "@vidstack/react";
 import {
   defaultLayoutIcons,
@@ -18,19 +19,17 @@ import { useRouter } from "next/navigation";
 import React, {
   Key,
   useEffect,
-  useOptimistic,
   useRef,
   useState,
-  useTransition,
+  useTransition
 } from "react";
-import { KeyedMutator, useSWRConfig } from "swr";
+import { useSWRConfig } from "swr";
+import { useMutateAll } from "../_lib/swr";
+import Alert from "./Alert";
 import DeleteConfirm from "./DeleteConfirm";
+import LoadingSpinner from "./LoadingSpinner";
 import TwittActions from "./TwittActions";
 import TwittSettings from "./TwittSettings";
-import Alert from "./Alert";
-import LoadingSpinner from "./LoadingSpinner";
-import { optimizedText } from "@/app/_utils/optimizedText";
-import { useMutateAll } from "../_lib/swr";
 
 export const ActionTypes = {
   INCREASE_VIEW: "INCREASE_VIEW",
@@ -41,16 +40,18 @@ export const ActionTypes = {
 type TwittProps = {
   twitt: ITwitt;
   user: UserWithFollows;
-  mutateTwitts: KeyedMutator<ITwitt[]>;
+  setTwitts: React.Dispatch<React.SetStateAction<ITwitt[]>>;
   twitts: ITwitt[];
+  setLikedTwitts: React.Dispatch<React.SetStateAction<ITwitt[]>>;
   mediaOnly?: boolean;
 };
 
 function Twitt({
   twitt,
   user,
-  mutateTwitts,
+  setTwitts,
   twitts,
+  setLikedTwitts,
   mediaOnly,
 }: TwittProps) {
   const [imageSize, setSmageSize] = useState({
@@ -67,7 +68,7 @@ function Twitt({
   const [pending, startTransition] = useTransition();
 
   async function handleIncreaseView() {
-    mutateTwitts(twitts.map(state => {
+    setTwitts(twitts.map(state => {
       if (state.id == twitt.id) {
         return {
           ...state,
@@ -84,7 +85,7 @@ function Twitt({
       ? ActionTypes.UNLIKE_TWITT
       : ActionTypes.LIKE_TWITT;
 
-    mutateTwitts(twitts.map((state) => {
+    setTwitts(twitts.map((state) => {
       if (twitt.id === state.id) {
         state = {
           ...state,
@@ -92,7 +93,8 @@ function Twitt({
         };
       }
       return state;
-    }), false);
+    }));
+    setLikedTwitts(prev => [...prev, twitt]);
     await likeTwitt({ twitt, user_id: user.id! });
   }
 

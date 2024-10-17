@@ -1,9 +1,7 @@
 "use client";
 
-import React from "react";
-import { ITwitt, User, UserWithFollows } from "@/app/_lib/definitions";
+import { ITwitt, UserWithFollows } from "@/app/_lib/definitions";
 import { setTwitts as setTwittsSlice } from "@/app/_lib/slices/appSlice";
-import { Session } from "next-auth";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import useSWR from "swr";
@@ -29,7 +27,8 @@ function TwittsList({
   const [user, setUser] = useState(initialUser);
   const dispatch = useDispatch();
   const [twitts, setTwitts] = useState(allTwitts);
-  const { mutate: mutateTwitts } = useSWR<ITwitt[]>(
+  const [likedTwitts, setLikedTwitts] = useState<ITwitt[]>([]);
+  useSWR<ITwitt[]>(
     `${type === "comments"
       ? "/api/twitts/comments"
       : (
@@ -49,14 +48,28 @@ function TwittsList({
             }`
         }`
       );
-      const data = await resp.json();
+      const data: ITwitt[] = await resp.json();
       if (data) {
-        setTwitts(data);
+        if (likedTwitts) {
+          setTwitts(data.map((twitt, idx) => {
+            if (twitt.id === likedTwitts[idx].id) {
+              let allLikes = [...twitt.likes, ...likedTwitts[idx].likes];
+              allLikes = allLikes.filter((like, idx) => allLikes.indexOf(like) !== idx);
+              twitt = {
+                ...twitt,
+                likes: allLikes
+              }
+            }
+            return twitt;
+          }));
+        } else {
+          setTwitts(data);
+        }
       }
       return data;
     },
     {
-      refreshInterval: 7000,
+      refreshInterval: 2000,
     }
   );
   useSWR<UserWithFollows>('/api/user/details', async () => {
@@ -76,8 +89,6 @@ function TwittsList({
     }
   }, [twitts]);
 
-  if (!twitts?.length) return;
-
   const groupedTwitts = [];
   for (let i = 0; i < twitts.length; i += 3) {
     groupedTwitts.push(twitts.slice(i, i + 3));
@@ -94,7 +105,8 @@ function TwittsList({
                   <Twitt
                     user={user}
                     twitt={twitt}
-                    mutateTwitts={mutateTwitts}
+                    setTwitts={setTwitts}
+                    setLikedTwitts={setLikedTwitts}
                     twitts={twitts}
                     mediaOnly={mediaOnly}
                   />
@@ -110,7 +122,8 @@ function TwittsList({
               user={user}
               key={twitt.id}
               twitt={twitt}
-              mutateTwitts={mutateTwitts}
+              setTwitts={setTwitts}
+              setLikedTwitts={setLikedTwitts}
               twitts={twitts}
               mediaOnly={mediaOnly}
             />

@@ -27,7 +27,7 @@ function TwittsList({
   const [user, setUser] = useState(initialUser);
   const dispatch = useDispatch();
   const [twitts, setTwitts] = useState(allTwitts);
-  const [isLiking, setIsLiking] = useState(false);
+  const [isActionOccurrs, setIsActionOccurrs] = useState(false);
   const { data: updatedTwitts, isLoading, isValidating } = useSWR<ITwitt[]>(
     `${type === "comments"
       ? "/api/twitts/comments"
@@ -67,16 +67,22 @@ function TwittsList({
   });
 
   useEffect(() => {
-    if (!isLiking && updatedTwitts && !isValidating && !isLoading) {
+    if (!isActionOccurrs && updatedTwitts && !isValidating && !isLoading) {
       setTwitts(updatedTwitts);
     }
-  }, [isLiking, updatedTwitts, isLoading, isValidating]);
+  }, [isActionOccurrs, updatedTwitts, isLoading, isValidating]);
 
   useEffect(() => {
     if (twitts) {
       dispatch(setTwittsSlice(twitts));
     }
   }, [twitts]);
+
+  useEffect(() => {
+    if (allTwitts) {
+      setTwitts(allTwitts);
+    }
+  }, [allTwitts]);
 
   const groupedTwitts = [];
   for (let i = 0; i < twitts.length; i += 3) {
@@ -95,8 +101,9 @@ function TwittsList({
                     user={user}
                     twitt={twitt}
                     setTwitts={setTwitts}
-                    setIsLiking={setIsLiking}
+                    setIsActionOccurrs={setIsActionOccurrs}
                     twitts={twitts}
+                    isUserTwitts={Boolean(userId)}
                     mediaOnly={mediaOnly}
                   />
                 </div>
@@ -112,8 +119,9 @@ function TwittsList({
               key={twitt.id}
               twitt={twitt}
               setTwitts={setTwitts}
-              setIsLiking={setIsLiking}
+              setIsActionOccurrs={setIsActionOccurrs}
               twitts={twitts}
+              isUserTwitts={Boolean(userId)}
               mediaOnly={mediaOnly}
             />
           ))}

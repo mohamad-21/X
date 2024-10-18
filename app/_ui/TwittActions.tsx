@@ -36,10 +36,14 @@ function TwittActions({ twitt, user, onCommentsClick, onRetwitt, onLike, classNa
         <span className="text-sm -ml-1">{twitt.comments.length}</span>
       </Button>
       <Button variant="bordered" className="flex items-center text-default-400 hover:bg-transparent hover:text-emerald-400 border-none group gap-0 transition-all duration-150 min-w-0 px-0" onClick={onRetwitt}>
-        <div className="rounded-full py-1.5 px-2 group-hover:bg-emerald-400/20" onClick={() => setShowUnavailable(true)}>
-          <LuRepeat2 size={20} />
+        <div className="rounded-full py-1.5 px-2 group-hover:bg-emerald-400/20">
+          {twitt.retwitts.some(retwitt => retwitt == user.id) ? (
+            <LuRepeat2 className="text-emerald-400" size={20} />
+          ) : (
+            <LuRepeat2 size={20} />
+          )}
         </div>
-        <span className="text-sm -ml-1">{twitt.retwitts.length}</span>
+        <span className={`text-sm -ml-1 ${twitt.retwitts.some(retwitt => retwitt == user.id) ? 'text-emerald-400' : ''}`}>{twitt.retwitts.length}</span>
       </Button>
       <Button type="submit" variant="bordered" className="flex items-center text-default-400 hover:bg-transparent hover:text-pink-600 border-none group gap-0 transition-all duration-150 min-w-0 px-0" onClick={onLike}>
         <div className="rounded-full py-1.5 px-2 group-hover:bg-pink-600/20">
@@ -49,7 +53,7 @@ function TwittActions({ twitt, user, onCommentsClick, onRetwitt, onLike, classNa
             <FaRegHeart size={15.5} />
           )}
         </div>
-        <span className="text-sm -ml-1">{twitt.likes.length}</span>
+        <span className={`text-sm -ml-1 ${twitt.likes.some(like => like == user.id) ? 'text-rose-500' : ''}`}>{twitt.likes.length}</span>
       </Button>
       <Button variant="bordered" className="flex items-center text-default-400 hover:bg-transparent hover:text-primary border-none group gap-0 transition-all duration-150 min-w-0 px-0">
         <div className="rounded-full py-1.5 px-2 group-hover:bg-primary/20">

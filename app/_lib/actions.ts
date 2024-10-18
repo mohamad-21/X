@@ -40,18 +40,33 @@ export async function getAlltwitts({
   username?: string;
   with_reply?: boolean;
 } = {}): Promise<ITwitt[]> {
-  const condition = `${byUsername && username ? "where users.username = ?" : ""
+  let condition = `${byUsername && username ? "where users.username = ?" : ""
     } ${!with_reply ? "and reply_to is null" : ""}`;
   const params: any[] = [];
+  let retwitts: ITwitt[] = [];
 
   if (byUsername) {
     params.push(username);
+    const [user] = await query<{ id: number }[]>("select id from users where username = ?", [username]);
+    const userRetwitts = await query<{ id: number, twitt_id: number, user_id: number, created_at: Date }[]>("select * from retwitts where user_id = ?", [user.id]);
+    const twittIds = userRetwitts.map(twitt => twitt.twitt_id);
+    retwitts = await getTwittsByIds(twittIds);
+    retwitts = retwitts.map((retwitt, idx) => {
+      retwitt.created_at = userRetwitts[idx].created_at
+      return retwitt;
+    })
   }
 
   const allTwitts = await query<ITwitt[]>(
     `select twitts.id, twitts.text, twitts.media, twitts.created_at, twitts.media_type, twitts.likes, twitts.views, twitts.reply_to, twitts.comments, twitts.retwitts, users.id as user_id, users.username, users.name, users.profile as user_profile from twitts join users on twitts.user_id = users.id ${condition} order by twitts.id desc`,
     params
   );
+
+  if (retwitts.length) {
+    return [
+      ...allTwitts, ...retwitts
+    ].sort((a, b) => b.created_at.getTime() - a.created_at.getTime())
+  }
 
   return allTwitts;
 }
@@ -677,4 +692,20 @@ export async function pushNotification({ user_id, opposite_id, type, place_id, t
   text?: string,
 }) {
   await query("insert into notifications(user_id, opposite_id, type, place_id, text) values(?,?,?,?,?)", [user_id, opposite_id || null, type || null, place_id || null, text || null]);
+}
+
+export async function retwittPost({ user_id, twitt_id }: { user_id: number | string, twitt_id: number | string }) {
+  await Promise.all([
+    await query("insert into retwitts(user_id, twitt_id) values(?,?)", [user_id, twitt_id]),
+    await query("update twitts set retwitts = json_array_append(retwitts, '$', ?) where id = ?", [`${user_id}`, twitt_id]),
+  ]);
+}
+
+export async function removePostRetwitt({ user_id, twitt_id }: { user_id: number | string, twitt_id: number | string }) {
+  const retwittPost = await getTwittById(twitt_id);
+  const updatedPostRetwitts = retwittPost?.retwitts.filter(retwitt => retwitt != user_id).toString();
+  await Promise.all([
+    await query("delete from retwitts where user_id = ? and twitt_id = ?", [user_id, twitt_id]),
+    await query("update twitts set retwitts = ? where id = ?", [`[${updatedPostRetwitts}]`, twitt_id]),
+  ]);
 }

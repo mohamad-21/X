@@ -4,6 +4,7 @@ import { ModalProps } from "./definitions";
 import { AppDispatch, AppStore, RootState } from "./store";
 import { useRouter } from "next/navigation";
 import { setIsChangingRoute } from "./slices/appSlice";
+import { NavigateOptions } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 export const useAppDispatch = useDispatch.withTypes<AppDispatch>();
 export const useAppSelector = useSelector.withTypes<RootState>();
@@ -76,12 +77,14 @@ export const useModalProps = (props?: ModalProps): ModalProps => {
 export const useRouteChangeTransition = () => {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const isChaningRoute = useAppSelector(state => state.app.isChangingRoute);
   const dispatch = useAppDispatch();
 
-  function changeRoute(route: string) {
+  function changeRoute(route: string, options?: NavigateOptions) {
     startTransition(() => {
-      router.push(route);
-    })
+      router.push(route, options);
+      dispatch(setIsChangingRoute(false));
+    });
   }
 
   useEffect(() => {

@@ -21,7 +21,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -30,10 +29,13 @@ export default async function RootLayout({
       <body className={`${chirp.className}`}>
         <Providers>
           <NextTopLoader zIndex={100} showSpinner={false} />
+          <div className="w-full p-1 text-center bg-default/20 z-[6] animate-top-header">
+            <p className="text-xs"><span className="text-success">**Disclaimer**:</span> This project is a personal, non-commercial portfolio piece. all trademarks belong to <a href="https://x.com" target="_blank">their</a> respective owners.</p>
+          </div>
           <div className="min-h-[100dvh] flex flex-col mx-auto xl:max-w-full lg:max-w-[1100px] max-w-3xl pb-4 bg-background text-forground">
             <main className="flex-1 flex flex-col justify-center sm:flex-row">
               <Suspense fallback={
-                <div className="flex items-center justify-center">
+                <div className="fixed inset-0 z-50 flex items-center justify-center">
                   <img src="/default_white.jpg" width={370} height={370} />
                 </div>
               }>

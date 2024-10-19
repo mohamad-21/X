@@ -103,7 +103,6 @@ function TwittsList({
                     setTwitts={setTwitts}
                     setIsActionOccurrs={setIsActionOccurrs}
                     twitts={twitts}
-                    isUserTwitts={Boolean(userId)}
                     mediaOnly={mediaOnly}
                   />
                 </div>
@@ -113,7 +112,7 @@ function TwittsList({
         </>
       ) : (
         <>
-          {twitts?.map((twitt) => (
+          {twitts?.map(twitt => (
             <Twitt
               user={user}
               key={twitt.id}
@@ -121,7 +120,7 @@ function TwittsList({
               setTwitts={setTwitts}
               setIsActionOccurrs={setIsActionOccurrs}
               twitts={twitts}
-              isUserTwitts={Boolean(userId)}
+              isRetwittAndInUserTwitts={Boolean(userId && twitt.isRetwitt)}
               mediaOnly={mediaOnly}
             />
           ))}

@@ -8,7 +8,7 @@ import {
   unFollow,
 } from "@/app/_lib/actions";
 import { ITwitt, UserWithFollows } from "@/app/_lib/definitions";
-import { useIsVisible, useRouteChangeTransition } from "@/app/_lib/hooks";
+import { useIsVisible } from "@/app/_lib/hooks";
 import { optimizedText } from "@/app/_utils/optimizedText";
 import { MediaPlayer, MediaProvider } from "@vidstack/react";
 import {
@@ -47,7 +47,7 @@ type TwittProps = {
   twitts: ITwitt[];
   setIsActionOccurrs: React.Dispatch<React.SetStateAction<boolean>>;
   mediaOnly?: boolean;
-  isUserTwitts: boolean;
+  isRetwittAndInUserTwitts?: boolean;
 };
 
 function Twitt({
@@ -57,7 +57,7 @@ function Twitt({
   twitts,
   setIsActionOccurrs,
   mediaOnly,
-  isUserTwitts
+  isRetwittAndInUserTwitts
 }: TwittProps) {
   const [imageSize, setSmageSize] = useState({
     width: 0,
@@ -67,9 +67,9 @@ function Twitt({
   const [message, setMessage] = useState("");
   const twittRef = useRef(null);
   const isVisible = useIsVisible(twittRef);
+  const [hide, setHide] = useState(false);
   const router = useRouter();
   const { mutate } = useSWRConfig();
-  const changeRoute = useRouteChangeTransition();
   const mutateAll = useMutateAll();
   const [pending, startTransition] = useTransition();
 
@@ -120,7 +120,10 @@ function Twitt({
         };
       }
       return state;
-    }))
+    }));
+    if (isAlreadyRetwitted && isRetwittAndInUserTwitts) {
+      setHide(true);
+    }
     if (isAlreadyRetwitted) {
       await removePostRetwitt({ twitt_id: twitt.id, user_id: user.id });
     } else {
@@ -137,7 +140,7 @@ function Twitt({
   function handleTwittClick(e: React.MouseEvent<any>) {
     const targetClassList = (e.target as Element).classList;
     if (targetClassList.contains("to-twitt")) {
-      changeRoute(`/${user.username}/status/${twitt.id}`, { scroll: false });
+      router.push(`/${user.username}/status/${twitt.id}`, { scroll: false });
     }
   }
 
@@ -183,6 +186,8 @@ function Twitt({
     }
   }, [message]);
 
+  if (hide) return null;
+
   return (
     <div
       ref={twittRef}
@@ -200,8 +205,8 @@ function Twitt({
         </Link>
       ) : (
         <>
-          {isUserTwitts && (twitt.user_id !== user.id) && (
-            <p className="inline-flex items-center text-default-400 text-xs mb-2 gap-0.5 ml-5 font-bold"><LuRepeat2 size={16} /> {twitt.name} Reposted</p>
+          {isRetwittAndInUserTwitts && (
+            <p className="inline-flex items-center text-default-400 text-xs mb-2 gap-0.5 ml-5 font-bold"><LuRepeat2 size={16} /> {user.name} Reposted</p>
           )}
           <div
             className="grid gap-4 to-twitt"

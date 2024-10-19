@@ -33,7 +33,9 @@ function TwittActions({ twitt, user, onCommentsClick, onRetwitt, onLike, classNa
         <div className="rounded-full py-1.5 px-2 group-hover:bg-primary/20">
           <FaRegComment size={17} className="relative" />
         </div>
-        <span className="text-sm -ml-1">{twitt.comments.length}</span>
+        {twitt.comments.length > 0 && (
+          <span className="text-sm -ml-0.5">{twitt.comments.length}</span>
+        )}
       </Button>
       <Button variant="bordered" className="flex items-center text-default-400 hover:bg-transparent hover:text-emerald-400 border-none group gap-0 transition-all duration-150 min-w-0 px-0" onClick={onRetwitt}>
         <div className="rounded-full py-1.5 px-2 group-hover:bg-emerald-400/20">
@@ -43,7 +45,9 @@ function TwittActions({ twitt, user, onCommentsClick, onRetwitt, onLike, classNa
             <LuRepeat2 size={20} />
           )}
         </div>
-        <span className={`text-sm -ml-1 ${twitt.retwitts.some(retwitt => retwitt == user.id) ? 'text-emerald-400' : ''}`}>{twitt.retwitts.length}</span>
+        {twitt.retwitts.length > 0 && (
+          <span className={`text-sm -ml-0.5 ${twitt.retwitts.some(retwitt => retwitt == user.id) ? 'text-emerald-400' : ''}`}>{twitt.retwitts.length}</span>
+        )}
       </Button>
       <Button type="submit" variant="bordered" className="flex items-center text-default-400 hover:bg-transparent hover:text-pink-600 border-none group gap-0 transition-all duration-150 min-w-0 px-0" onClick={onLike}>
         <div className="rounded-full py-1.5 px-2 group-hover:bg-pink-600/20">
@@ -53,13 +57,16 @@ function TwittActions({ twitt, user, onCommentsClick, onRetwitt, onLike, classNa
             <FaRegHeart size={15.5} />
           )}
         </div>
-        <span className={`text-sm -ml-1 ${twitt.likes.some(like => like == user.id) ? 'text-rose-500' : ''}`}>{twitt.likes.length}</span>
+
+        {twitt.likes.length > 0 && (
+          <span className={`text-sm -ml-0.5 ${twitt.likes.some(like => like == user.id) ? 'text-rose-500' : ''}`}>{twitt.likes.length}</span>
+        )}
       </Button>
       <Button variant="bordered" className="flex items-center text-default-400 hover:bg-transparent hover:text-primary border-none group gap-0 transition-all duration-150 min-w-0 px-0">
         <div className="rounded-full py-1.5 px-2 group-hover:bg-primary/20">
           <SiSimpleanalytics size={12} />
         </div>
-        <span className="text-sm -ml-1">{numeral(twitt.views.length).format('0a')}</span>
+        <span className="text-sm -ml-0.5">{numeral(twitt.views.length).format('0a')}</span>
       </Button>
       <div className="flex items-center">
         <Button isIconOnly radius="full" size="sm" variant="bordered" className="flex items-center text-default-400 hover:bg-transparent hover:text-primary border-none group gap-0 transition-all duration-150 min-w-0 px-0" onClick={() => setShowUnavailable(true)}>

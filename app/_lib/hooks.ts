@@ -77,7 +77,6 @@ export const useModalProps = (props?: ModalProps): ModalProps => {
 export const useRouteChangeTransition = () => {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
-  const isChaningRoute = useAppSelector(state => state.app.isChangingRoute);
   const dispatch = useAppDispatch();
 
   function changeRoute(route: string, options?: NavigateOptions) {

@@ -49,12 +49,14 @@ export async function getAlltwitts({
     params.push(username);
     const [user] = await query<{ id: number }[]>("select id from users where username = ?", [username]);
     const userRetwitts = await query<{ id: number, twitt_id: number, user_id: number, created_at: Date }[]>("select * from retwitts where user_id = ?", [user.id]);
-    const twittIds = userRetwitts.map(twitt => twitt.twitt_id);
-    retwitts = await getTwittsByIds(twittIds);
-    retwitts = retwitts.map((retwitt, idx) => {
-      retwitt.created_at = userRetwitts[idx].created_at
-      return retwitt;
-    })
+    if (userRetwitts.length) {
+      const twittIds = userRetwitts.map(twitt => twitt.twitt_id);
+      retwitts = await getTwittsByIds(twittIds);
+      retwitts = retwitts.map((retwitt, idx) => {
+        retwitt.created_at = userRetwitts[idx].created_at
+        return retwitt;
+      })
+    }
   }
 
   const allTwitts = await query<ITwitt[]>(
@@ -65,7 +67,7 @@ export async function getAlltwitts({
   if (retwitts.length) {
     return [
       ...allTwitts, ...retwitts
-    ].sort((a, b) => b.created_at.getTime() - a.created_at.getTime())
+    ].sort((a, b) => b.created_at.getTime() - a.created_at.getTime());
   }
 
   return allTwitts;
@@ -91,10 +93,13 @@ export async function getTwittById(
 export async function getTwittsByIds(
   ids: (number | string)[]
 ) {
+  const idsQuery = ids.map(() => '?').join(',');
   const twitts = await query<ITwitt[]>(
-    "select twitts.id, twitts.text, twitts.media, twitts.created_at, twitts.media_type, twitts.likes, twitts.views, twitts.reply_to, twitts.comments, twitts.retwitts, users.id as user_id, users.username, users.name, users.profile as user_profile from twitts join users on twitts.user_id = users.id where twitts.id in(?) order by twitts.id desc",
-    [ids.join(',')]
+    `select twitts.id, twitts.text, twitts.media, twitts.created_at, twitts.media_type, twitts.likes, twitts.views, twitts.reply_to, twitts.comments, twitts.retwitts, users.id as user_id, users.username, users.name, users.profile as user_profile from twitts join users on twitts.user_id = users.id where twitts.id in(${idsQuery}) order by twitts.id desc`,
+    ids
   );
+
+  twitts.map(twitt => twitt.isRetwitt = true);
 
   return twitts;
 }

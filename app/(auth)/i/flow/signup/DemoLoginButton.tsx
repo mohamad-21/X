@@ -11,7 +11,7 @@ function DemoLoginButton() {
     <>
       <Button onClick={async () => {
         startTransition(async () => {
-          await signinWithCredentials({ email_username: "wyattmohammad1371017@gmail.com", password: '123' });
+          await signinWithCredentials({ email_username: "wyattmohammad1371017@gmail.com", password: '12345678' });
           router.replace('/home');
         })
       }} variant="ghost" radius="full">Demo Login</Button>

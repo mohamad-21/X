@@ -1,12 +1,11 @@
-import { auth } from "@/app/_lib/auth";
 import LoginFlow from "@/app/(auth)/i/flow/login/LoginFlow";
-import { redirect } from "next/navigation";
+import { Metadata } from "next";
 
-export default async function Page() {
-  const session = await auth();
+export const metadata: Metadata = {
+  title: "Login on X"
+};
 
-  if (session) redirect('/');
-
+export default function Page() {
   return (
     <LoginFlow />
   )

@@ -8,7 +8,7 @@ import Twitt from "./Twitt";
 import { auth } from "@/app/_lib/auth";
 import LoadingSpinner from "@/app/_ui/LoadingSpinner";
 import TwittCommentsWrapper from "./TwittCommentsWrapper";
-import { getUserDetailsFromAPI } from "@/app/_lib/helpers";
+import { getUserDetailsFromAPI } from "@/app/_lib/actions";
 
 async function TwittWrapper({ postId }: { postId: string }) {
   const [session, twitt] = await Promise.all([

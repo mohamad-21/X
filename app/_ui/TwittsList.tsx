@@ -13,6 +13,7 @@ type TwittsListProps = {
   mediaOnly?: boolean;
   userId?: number | string;
   twittId?: number | string;
+  noRevalidate?: boolean;
   type?: "without_replies" | "with_replies" | "comments";
 };
 
@@ -21,6 +22,7 @@ function TwittsList({
   allTwitts,
   mediaOnly = false,
   userId,
+  noRevalidate,
   twittId,
   type,
 }: TwittsListProps) {
@@ -28,7 +30,7 @@ function TwittsList({
   const dispatch = useDispatch();
   const [twitts, setTwitts] = useState(allTwitts);
   const [isActionOccurrs, setIsActionOccurrs] = useState(false);
-  const { data: updatedTwitts, isLoading, isValidating } = useSWR<ITwitt[]>(
+  const { data: updatedTwitts, isLoading, isValidating } = !noRevalidate ? useSWR<ITwitt[]>(
     `${type === "comments"
       ? "/api/twitts/comments"
       : (
@@ -54,17 +56,19 @@ function TwittsList({
     {
       refreshInterval: 7000,
     }
-  );
-  useSWR<UserWithFollows>('/api/user/details', async () => {
-    const resp = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/user/details?id=${user.id}`);
-    const data = await resp.json();
-    if (data) {
-      setUser(data);
-    }
-    return data;
-  }, {
-    refreshInterval: 10000
-  });
+  ) : { data: null, isLoading: null, isValidating: null };
+  if (!noRevalidate) {
+    useSWR<UserWithFollows>('/api/user/details', async () => {
+      const resp = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/user/details?id=${user.id}`);
+      const data = await resp.json();
+      if (data) {
+        setUser(data);
+      }
+      return data;
+    }, {
+      refreshInterval: 10000
+    });
+  }
 
   useEffect(() => {
     if (!isActionOccurrs && updatedTwitts && !isValidating && !isLoading) {
@@ -112,7 +116,7 @@ function TwittsList({
         </>
       ) : (
         <>
-          {twitts?.map(twitt => (
+          {(userId ? [...twitts.filter(twitt => twitt.is_pinned === 1), ...twitts.filter(twitt => twitt.is_pinned === 0)] : twitts).map(twitt => (
             <Twitt
               user={user}
               key={twitt.id}
@@ -120,6 +124,7 @@ function TwittsList({
               setTwitts={setTwitts}
               setIsActionOccurrs={setIsActionOccurrs}
               twitts={twitts}
+              isUserTwitts={Boolean(userId)}
               isRetwittAndInUserTwitts={Boolean(userId && twitt.isRetwitt)}
               mediaOnly={mediaOnly}
             />

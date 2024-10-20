@@ -17,6 +17,7 @@ import {
   User,
   UserFollowingsAndFollowers,
   UserFollowingsAndFollowersTable,
+  UserWithFollows,
   Verification,
 } from "./definitions";
 import { sendMail } from "./sendMail";
@@ -60,7 +61,7 @@ export async function getAlltwitts({
   }
 
   const allTwitts = await query<ITwitt[]>(
-    `select twitts.id, twitts.text, twitts.media, twitts.created_at, twitts.media_type, twitts.likes, twitts.views, twitts.reply_to, twitts.comments, twitts.retwitts, users.id as user_id, users.username, users.name, users.profile as user_profile from twitts join users on twitts.user_id = users.id ${condition} order by twitts.id desc`,
+    `select twitts.id, twitts.text, twitts.media, twitts.created_at, twitts.media_type, twitts.likes, twitts.views, twitts.reply_to, twitts.comments, twitts.retwitts, twitts.is_pinned, users.id as user_id, users.username, users.name, users.profile as user_profile from twitts join users on twitts.user_id = users.id ${condition} order by twitts.id desc`,
     params
   );
 
@@ -73,6 +74,11 @@ export async function getAlltwitts({
   return allTwitts;
 }
 
+export async function getTwittsBySearch(searchTerm: string) {
+  const twitts = await query<ITwitt[]>("select twitts.id, twitts.text, twitts.media, twitts.created_at, twitts.media_type, twitts.likes, twitts.views, twitts.reply_to, twitts.comments, twitts.retwitts, twitts.is_pinned, users.id as user_id, users.username, users.name, users.profile as user_profile from twitts join users on twitts.user_id = users.id where text like ? and twitts.reply_to is null order by twitts.id desc", [`%${searchTerm}%`]);
+  return twitts;
+}
+
 export async function logOut() {
   await signOut();
   redirect('/');
@@ -82,7 +88,7 @@ export async function getTwittById(
   id: number | string
 ): Promise<ITwitt | null> {
   const [twitt] = await query<ITwitt[]>(
-    "select twitts.id, twitts.text, twitts.media, twitts.created_at, twitts.media_type, twitts.likes, twitts.views, twitts.reply_to, twitts.comments, twitts.retwitts, users.id as user_id, users.username, users.name, users.profile as user_profile from twitts join users on twitts.user_id = users.id where twitts.id = ? order by twitts.id desc",
+    "select twitts.id, twitts.text, twitts.media, twitts.created_at, twitts.media_type, twitts.likes, twitts.views, twitts.reply_to, twitts.comments, twitts.retwitts, twitts.is_pinned, users.id as user_id, users.username, users.name, users.profile as user_profile from twitts join users on twitts.user_id = users.id where twitts.id = ? order by twitts.id desc",
     [id]
   );
   if (!twitt) return null;
@@ -95,7 +101,7 @@ export async function getTwittsByIds(
 ) {
   const idsQuery = ids.map(() => '?').join(',');
   const twitts = await query<ITwitt[]>(
-    `select twitts.id, twitts.text, twitts.media, twitts.created_at, twitts.media_type, twitts.likes, twitts.views, twitts.reply_to, twitts.comments, twitts.retwitts, users.id as user_id, users.username, users.name, users.profile as user_profile from twitts join users on twitts.user_id = users.id where twitts.id in(${idsQuery}) order by twitts.id desc`,
+    `select twitts.id, twitts.text, twitts.media, twitts.created_at, twitts.media_type, twitts.likes, twitts.views, twitts.reply_to, twitts.comments, twitts.retwitts, twitts.is_pinned, users.id as user_id, users.username, users.name, users.profile as user_profile from twitts join users on twitts.user_id = users.id where twitts.id in(${idsQuery}) order by twitts.id desc`,
     ids
   );
 
@@ -106,7 +112,7 @@ export async function getTwittsByIds(
 
 export async function getTwittComments(twitt_id: number | string) {
   const comments = await query<ITwitt[]>(
-    "select twitts.id, twitts.text, twitts.media, twitts.created_at, twitts.media_type, twitts.likes, twitts.views, twitts.reply_to, twitts.retwitts, twitts.comments, users.id as user_id, users.username, users.name, users.profile as user_profile from twitts join users on twitts.user_id = users.id where twitts.reply_to = ? order by twitts.id desc",
+    "select twitts.id, twitts.text, twitts.media, twitts.created_at, twitts.media_type, twitts.likes, twitts.views, twitts.reply_to, twitts.retwitts, twitts.comments, twitts.is_pinned, users.id as user_id, users.username, users.name, users.profile as user_profile from twitts join users on twitts.user_id = users.id where twitts.reply_to = ? order by twitts.id desc",
     [twitt_id]
   );
 
@@ -156,6 +162,23 @@ export async function getUserById(
     ...result[0],
     twitts: userTwitts,
   };
+}
+
+export async function getUserDetailsFromAPI(id: number | string) {
+  const resp = await fetch(`${process.env.AUTH_URL}/api/user/details?id=${id}`);
+  const data: UserWithFollows = await resp.json();
+  return data;
+}
+
+export async function pinTwittToProfile({ twitt_id, user_id }: { twitt_id: number | string, user_id: number | string }) {
+  await Promise.all([
+    query("update twitts set is_pinned = 0 where user_id = ?", [user_id]),
+    query("update twitts set is_pinned = 1 where id = ?", [twitt_id])
+  ])
+}
+
+export async function unpinTwittFromProfile(twitt_id: number | string) {
+  await query("update twitts set is_pinned = 0 where id = ?", [twitt_id]);
 }
 
 export async function getUserFollowersAndFollowings(
@@ -209,7 +232,6 @@ export async function deleteTwitt(twitt_id: number | string) {
       twitt[0].comments.length ? deleteComments() : null,
     ]);
   }
-  revalidatePath('/home');
 }
 
 export async function signinWithGoogle() {
@@ -283,7 +305,7 @@ export async function sendPasswordResetVerification(email: string) {
   const code = Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
   const expiresAt = new Date();
   expiresAt.setHours(expiresAt.getHours() + 2);
-
+  const expiresToDatetime = expiresAt.toISOString().slice(0, 19).replace('T', ' ');
   try {
     await sendMail({
       to: email,
@@ -291,9 +313,6 @@ export async function sendPasswordResetVerification(email: string) {
       subject: `${code} is your verification code`,
       html: `<div style="width:100%;padding-top:4rem;display:grid">
             <div style="width:100%;max-width:400px; margin:0 auto">
-              <div style="text-align:right">
-                <img src="https://ci3.googleusercontent.com/meips/ADKq_NZv1LPCO7Dm0Tbxgo4wYzgVc98KD0XOwdh2ApRPvtcVePA5mJQh7FXBNxGjHCxLDdp2iqKqET39bJqpw3weaVsdP-zGJWNJ03cPCASbcXV1iX1pp3bCY7bzGZIUIvhYSBY9_zU=s0-d-e1-ft#https://ton.twitter.com/twitter_blue_for_business/verified-programs/x_logo.png" width="30" height="30" class="CToWUd" data-bit="iit">
-              </div>
               <h1 style="margin-bottom:14px; margin-top:27px">Reset your password?</h1>
               <p style="margin-bottom:12px;font-size:1rem">If you requested a password reset for @Mohamadc21, use the confirmation code below to complete the process. If you didn't make this request, ignore this email.</p>
               <div style="margin-bottom:12px">
@@ -319,12 +338,12 @@ export async function sendPasswordResetVerification(email: string) {
     if (oldVerification[0].total_verifications > 0) {
       result = await query("update verifications set code=?,expires_at=?", [
         code,
-        expiresAt.toISOString(),
+        expiresToDatetime,
       ]);
     } else {
       result = await query(
         "insert into verifications (email, code, expires_at) values (?, ?, ?)",
-        [email, code, expiresAt.toISOString()]
+        [email, code, expiresToDatetime]
       );
     }
   } catch (err) {

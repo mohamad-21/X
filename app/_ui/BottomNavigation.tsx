@@ -12,11 +12,13 @@ import { IoMail, IoMailOutline } from "react-icons/io5";
 import { Badge } from "@nextui-org/react";
 import { SessionUser } from "@/app/_lib/definitions";
 import Alert from "./Alert";
+import { useAppSelector } from "../_lib/hooks";
 
 
 function BottomNavigation({ user }: { user: SessionUser }) {
   const [message, setMessage] = useState('');
   const pathname = usePathname();
+  const notifs = useAppSelector(state => state.app.notifications);
   const links = [
     {
       href: '/home',
@@ -28,8 +30,8 @@ function BottomNavigation({ user }: { user: SessionUser }) {
       disabled: false
     },
     {
-      href: '/explore',
-      text: 'Explore',
+      href: '/search',
+      text: 'Search',
       logo: {
         outline: <IoIosSearch size={25} />,
         filled: <IoIosSearch size={25} />,
@@ -85,7 +87,15 @@ function BottomNavigation({ user }: { user: SessionUser }) {
               </Button>
             ) : (
               <Button variant="light" as={link.disabled ? "button" : (link?.href ? Link : "button")} href={link?.href || undefined} size="lg" isIconOnly className="flex hover:no-underline  min-w-max items-center justify-center gap-4 text-xl" onClick={() => link.disabled ? setMessage("This page is not available for now.") : {}} radius="full">
-                {pathname === link.href ? link.logo.filled : link.logo.outline}
+                {(link.href === '/notifications' && notifs.length > 0) ? (
+                  <Badge content={notifs.length} color="primary">
+                    {pathname ? (pathname === link.href ? link.logo.filled : link.logo.outline) : null}
+                  </Badge>
+                ) : (
+                  <>
+                    {pathname ? (pathname === link.href ? link.logo.filled : link.logo.outline) : null}
+                  </>
+                )}
               </Button>
             )}
           </li>

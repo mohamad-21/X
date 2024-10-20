@@ -1,4 +1,4 @@
-import { getTwittById, getTwittsByIds, getUserNotifications, readNotifications } from "@/app/_lib/actions";
+import { getTwittsByIds, getUserNotifications, readNotifications } from "@/app/_lib/actions";
 import { auth } from "@/app/_lib/auth";
 import Notifications from "./Notifications";
 
@@ -22,6 +22,15 @@ async function NotificationsWrapper() {
       }
       return notif;
     })
+  }
+
+  if (userNotifications.length > 1) {
+    return (
+      <div className="mx-auto max-w-md px-5 py-10">
+        <h1 className="text-4xl mb-1 font-bold">Nothing to see here yet</h1>
+        <p className="text-default-400">When someone mentions you, you'll find it here.</p>
+      </div>
+    )
   }
 
   return (

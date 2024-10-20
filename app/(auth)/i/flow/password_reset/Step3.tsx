@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { PasswordData } from "@/app/_lib/definitions";
 import { ModalBody, ModalFooter } from "@nextui-org/modal";
 import { Button, Input } from "@nextui-org/react";
@@ -9,6 +9,7 @@ import { StepsProps } from "./PasswordResetFlow";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { changePassword } from "@/app/_lib/actions";
 import { useRouter } from "next/navigation";
+import Alert from '@/app/_ui/Alert';
 
 interface PasswordResetData extends PasswordData {
   confirmPassword: string;
@@ -25,6 +26,7 @@ const StrongPasswordScheme: z.ZodType<PasswordResetData> = z.object({
   });
 
 function Step3({ flow, setFlow, onTransition }: StepsProps) {
+  const [message, setMessage] = useState('');
   const formRef = useRef<HTMLFormElement>(null);
   const { register, handleSubmit, formState: { isValid, errors } } = useForm<PasswordResetData>({
     mode: 'onTouched',
@@ -37,7 +39,10 @@ function Step3({ flow, setFlow, onTransition }: StepsProps) {
     onTransition(async () => {
       const error = await changePassword(flow.email!, data.password);
       if (error) return setFlow(prev => ({ ...prev, error: error.message! }));
-      router.push('/api/auth/logout');
+      setMessage('Your password reseted successfully, you will redirect to homepage');
+      setTimeout(() => {
+        router.replace('/');
+      }, 5000);
     })
   }
 
@@ -83,6 +88,7 @@ function Step3({ flow, setFlow, onTransition }: StepsProps) {
       <ModalFooter>
         <Button color="secondary" onClick={() => formRef.current?.requestSubmit()} isDisabled={!isValid} size="lg" radius="full" className="w-full text-lg font-bold">Change password</Button>
       </ModalFooter>
+      {message && <Alert>{message}</Alert>}
     </>
   )
 }

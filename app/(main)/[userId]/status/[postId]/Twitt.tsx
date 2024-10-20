@@ -6,7 +6,11 @@ import {
   follow,
   increaseTwittView,
   likeTwitt,
+  pinTwittToProfile,
+  removePostRetwitt,
+  retwittPost,
   unFollow,
+  unpinTwittFromProfile,
 } from "@/app/_lib/actions";
 import {
   ITwitt,
@@ -44,7 +48,7 @@ function Twitt({
   user: UserWithFollows;
 }) {
   const [twitt, setTwitt] = useState(data);
-  const [isLiking, setIsLiking] = useState(false);
+  const [isActionOccurrs, setIsActionOccurrs] = useState(false);
   const [followingText, setFollowingText] = useState("Following");
   const [imageSize, setSmageSize] = useState({
     width: 1,
@@ -78,15 +82,30 @@ function Twitt({
   }
 
   async function handleTwittLike() {
-    setIsLiking(true);
+    setIsActionOccurrs(true);
     const likeType = twitt.likes.some((like) => like == user.id!)
       ? ActionTypes.UNLIKE_TWITT
       : ActionTypes.LIKE_TWITT;
-    setTwitt({ ...twitt, likes: likeType == ActionTypes.LIKE_TWITT ? [...twitt.likes, user.id] : twitt.likes.filter((like) => like != user.id) });
+    setTwitt(state => ({ ...state, likes: likeType == ActionTypes.LIKE_TWITT ? [...state.likes, user.id] : state.likes.filter((like) => like != user.id) }));
 
     await likeTwitt({ twitt, user_id: user.id });
     mutate('/api/twitt');
-    setIsLiking(false);
+    setIsActionOccurrs(false);
+  }
+
+  async function handleRetwitt() {
+    setIsActionOccurrs(true);
+    const isAlreadyRetwitted = twitt.retwitts.some(retwitt => retwitt == user.id);
+    setTwitt(state => ({ ...state, retwitts: isAlreadyRetwitted ? state.retwitts.filter(retwitt => retwitt != user.id) : [...state.retwitts, user.id] }));
+    if (isAlreadyRetwitted) {
+      await removePostRetwitt({ twitt_id: twitt.id, user_id: user.id });
+    } else {
+      await retwittPost({ twitt_id: twitt.id, user_id: user.id });
+    }
+    mutate('/api/twitt');
+    setTimeout(() => {
+      setIsActionOccurrs(false);
+    }, 1500);
   }
 
   async function hanldeFollow() {
@@ -109,6 +128,12 @@ function Twitt({
     setMessage("");
     if (key === "delete") {
       setShowDeleteConfirm(true);
+    } else if (key === 'pin') {
+      setMessage("Post pinned on your profile");
+      await pinTwittToProfile({ twitt_id: twitt.id, user_id: user.id });
+    } else if (key === 'unpin') {
+      setMessage("Post Unpinned from your profile");
+      await unpinTwittFromProfile(twitt.id);
     } else {
       setMessage("This action is not available for now.");
     }
@@ -122,10 +147,10 @@ function Twitt({
   }
 
   useEffect(() => {
-    if (!isLiking && updatedTwitt && !isLoading && !isValidating) {
+    if (!isActionOccurrs && updatedTwitt && !isLoading && !isValidating) {
       setTwitt(updatedTwitt);
     }
-  }, [updatedTwitt, isLiking, isLoading, isValidating]);
+  }, [updatedTwitt, isActionOccurrs, isLoading, isValidating]);
 
   useEffect(() => {
     setTwitt(data);
@@ -246,6 +271,7 @@ function Twitt({
           onCommentsClick={() => {
             router.push(`/post?replyto=${twitt.id}`);
           }}
+          onRetwitt={handleRetwitt}
           onLike={handleTwittLike}
           className="border-y border-y-default py-2"
         />

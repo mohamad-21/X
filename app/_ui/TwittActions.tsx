@@ -1,4 +1,4 @@
-import { ITwitt, SessionUser, UserWithFollows } from "@/app/_lib/definitions";
+import { ITwitt, UserWithFollows } from "@/app/_lib/definitions";
 import { Button } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { FaHeart, FaRegComment, FaRegHeart } from "react-icons/fa";
@@ -34,7 +34,7 @@ function TwittActions({ twitt, user, onCommentsClick, onRetwitt, onLike, classNa
           <FaRegComment size={17} className="relative" />
         </div>
         {twitt.comments.length > 0 && (
-          <span className="text-sm -ml-0.5">{twitt.comments.length}</span>
+          <span className="text-sm">{twitt.comments.length}</span>
         )}
       </Button>
       <Button variant="bordered" className="flex items-center text-default-400 hover:bg-transparent hover:text-emerald-400 border-none group gap-0 transition-all duration-150 min-w-0 px-0" onClick={onRetwitt}>
@@ -46,7 +46,7 @@ function TwittActions({ twitt, user, onCommentsClick, onRetwitt, onLike, classNa
           )}
         </div>
         {twitt.retwitts.length > 0 && (
-          <span className={`text-sm -ml-0.5 ${twitt.retwitts.some(retwitt => retwitt == user.id) ? 'text-emerald-400' : ''}`}>{twitt.retwitts.length}</span>
+          <span className={`text-sm ${twitt.retwitts.some(retwitt => retwitt == user.id) ? 'text-emerald-400' : ''}`}>{twitt.retwitts.length}</span>
         )}
       </Button>
       <Button type="submit" variant="bordered" className="flex items-center text-default-400 hover:bg-transparent hover:text-pink-600 border-none group gap-0 transition-all duration-150 min-w-0 px-0" onClick={onLike}>
@@ -59,14 +59,14 @@ function TwittActions({ twitt, user, onCommentsClick, onRetwitt, onLike, classNa
         </div>
 
         {twitt.likes.length > 0 && (
-          <span className={`text-sm -ml-0.5 ${twitt.likes.some(like => like == user.id) ? 'text-rose-500' : ''}`}>{twitt.likes.length}</span>
+          <span className={`text-sm ${twitt.likes.some(like => like == user.id) ? 'text-rose-500' : ''}`}>{twitt.likes.length}</span>
         )}
       </Button>
       <Button variant="bordered" className="flex items-center text-default-400 hover:bg-transparent hover:text-primary border-none group gap-0 transition-all duration-150 min-w-0 px-0">
         <div className="rounded-full py-1.5 px-2 group-hover:bg-primary/20">
           <SiSimpleanalytics size={12} />
         </div>
-        <span className="text-sm -ml-0.5">{numeral(twitt.views.length).format('0a')}</span>
+        <span className="text-sm">{numeral(twitt.views.length).format('0a')}</span>
       </Button>
       <div className="flex items-center">
         <Button isIconOnly radius="full" size="sm" variant="bordered" className="flex items-center text-default-400 hover:bg-transparent hover:text-primary border-none group gap-0 transition-all duration-150 min-w-0 px-0" onClick={() => setShowUnavailable(true)}>

@@ -61,20 +61,17 @@ export const authConfig: NextAuthConfig = {
   ],
   callbacks: {
     authorized: ({ request, auth }) => {
-      if (request.nextUrl.pathname !== '/' && !auth?.user) {
+      if (!["/", "/i/flow/login", "/i/flow/signup", "/i/flow/password_reset"].includes(request.nextUrl.pathname) && !auth?.user) {
         return NextResponse.redirect(new URL('/', request.url));
       }
       const requestHeaders = new Headers(request.headers);
       requestHeaders.set('x-pathname', request.nextUrl.pathname);
 
-      if (auth?.user?.id) {
-        return NextResponse.next({
-          request: {
-            headers: requestHeaders
-          }
-        })
-      }
-      return false;
+      return NextResponse.next({
+        request: {
+          headers: requestHeaders
+        }
+      })
     },
     jwt: async ({ token, trigger }) => {
       if (!token.user || trigger === 'update') {

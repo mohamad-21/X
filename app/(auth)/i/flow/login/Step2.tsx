@@ -65,7 +65,7 @@ function Step2({ onTransition }: { onTransition: (callback: () => Promise<any>) 
                   label: "text-lg text-darkgray"
                 }}
               />
-              <Link className="text-sm" href="/i/flow/password-reset">Forgot password?</Link>
+              <Link className="text-sm" href="/i/flow/password_reset">Forgot password?</Link>
             </div>
           </form>
         </div>

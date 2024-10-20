@@ -1,7 +1,7 @@
 import { getAlltwitts } from "@/app/_lib/actions";
 import CreatePost from "@/app/_ui/createPost/CreatePost";
 import { Suspense } from "react";
-import { UserWithFollows } from "../_lib/definitions";
+import { UserWithFollows } from "@/app/_lib/definitions";
 import LoadingSpinner from "./LoadingSpinner";
 import TwittsList from "./TwittsList";
 

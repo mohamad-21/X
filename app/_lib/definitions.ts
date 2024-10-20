@@ -82,7 +82,8 @@ export interface ITwitt extends Omit<TwittsTable, 'image'> {
   username: string,
   name: string,
   user_profile: string,
-  isRetwitt?: boolean
+  isRetwitt?: boolean,
+  is_pinned: 0 | 1
 }
 
 export interface Verification {

@@ -84,8 +84,8 @@ function TwittSettings({
         >
           Block @{twitt.username}
         </DropdownItem>
-        <DropdownItem key="pin" startContent={<MdOutlinePushPin />}>
-          Pin to your profile
+        <DropdownItem key={twitt.is_pinned ? 'unpin' : 'pin'} startContent={<MdOutlinePushPin />}>
+          {twitt.is_pinned ? "Unpin to your profile" : "Pin to your profile"}
         </DropdownItem>
         <DropdownItem key="highlight" startContent={<BsStars />}>
           Highlight on your profile

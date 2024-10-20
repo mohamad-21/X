@@ -3,9 +3,11 @@ import {
   follow,
   increaseTwittView,
   likeTwitt,
+  pinTwittToProfile,
   removePostRetwitt,
   retwittPost,
   unFollow,
+  unpinTwittFromProfile,
 } from "@/app/_lib/actions";
 import { ITwitt, UserWithFollows } from "@/app/_lib/definitions";
 import { useIsVisible } from "@/app/_lib/hooks";
@@ -25,6 +27,8 @@ import React, {
   useState,
   useTransition
 } from "react";
+import { LuRepeat2 } from "react-icons/lu";
+import { MdOutlinePushPin } from "react-icons/md";
 import { useSWRConfig } from "swr";
 import { useMutateAll } from "../_lib/swr";
 import Alert from "./Alert";
@@ -32,7 +36,6 @@ import DeleteConfirm from "./DeleteConfirm";
 import LoadingSpinner from "./LoadingSpinner";
 import TwittActions from "./TwittActions";
 import TwittSettings from "./TwittSettings";
-import { LuRepeat2 } from "react-icons/lu";
 
 export const ActionTypes = {
   INCREASE_VIEW: "INCREASE_VIEW",
@@ -47,6 +50,7 @@ type TwittProps = {
   twitts: ITwitt[];
   setIsActionOccurrs: React.Dispatch<React.SetStateAction<boolean>>;
   mediaOnly?: boolean;
+  isUserTwitts?: boolean;
   isRetwittAndInUserTwitts?: boolean;
 };
 
@@ -57,6 +61,7 @@ function Twitt({
   twitts,
   setIsActionOccurrs,
   mediaOnly,
+  isUserTwitts,
   isRetwittAndInUserTwitts
 }: TwittProps) {
   const [imageSize, setSmageSize] = useState({
@@ -156,6 +161,12 @@ function Twitt({
       await unFollow(user.id, twitt.user_id);
       mutate('/api/user/details');
       setMessage(`@${twitt.username} now is not in your followings`);
+    } else if (key === 'pin') {
+      setMessage("Post pinned on your profile");
+      await pinTwittToProfile({ twitt_id: twitt.id, user_id: user.id });
+    } else if (key === 'unpin') {
+      setMessage("Post Unpinned from your profile");
+      await unpinTwittFromProfile(twitt.id);
     } else {
       setMessage("This action is not available for now.");
     }
@@ -164,7 +175,7 @@ function Twitt({
   async function handleTwittDelete() {
     startTransition(async () => {
       await deleteTwitt(twitt.id);
-      // setTwitts((prev) => prev.filter((t) => t.id !== twitt.id));
+      setTwitts((prev) => prev.filter((t) => t.id !== twitt.id));
       setShowDeleteConfirm(false);
     });
     mutateAll();
@@ -205,8 +216,15 @@ function Twitt({
         </Link>
       ) : (
         <>
-          {isRetwittAndInUserTwitts && (
-            <p className="inline-flex items-center text-default-400 text-xs mb-2 gap-0.5 ml-5 font-bold"><LuRepeat2 size={16} /> {user.name} Reposted</p>
+          {isUserTwitts && (
+            <>
+              {twitt.is_pinned === 1 && (
+                <p className="inline-flex items-center text-default-400 text-xs mb-2 gap-0.5 ml-5 font-bold"><MdOutlinePushPin size={16} /> Pinned</p>
+              )}
+              {isRetwittAndInUserTwitts && (
+                <p className="inline-flex items-center text-default-400 text-xs mb-2 gap-0.5 ml-5 font-bold"><LuRepeat2 size={16} /> {user.name} Reposted</p>
+              )}
+            </>
           )}
           <div
             className="grid gap-4 to-twitt"
@@ -252,10 +270,9 @@ function Twitt({
                   <p
                     className="whitespace-pre-wrap -mt-1 break-words to-twitt"
                     dir={/[\u0600-\u06FF]/.test(twitt.text) ? "rtl" : "ltr"}
-                    dangerouslySetInnerHTML={{
-                      __html: optimizedText(twitt.text),
-                    }}
-                  />
+                    dangerouslySetInnerHTML={{ __html: optimizedText(twitt.text) }}
+                  >
+                  </p>
                 )}
                 {twitt.media &&
                   ["image", "gif"].includes(twitt.media_type ?? "") && (

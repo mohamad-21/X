@@ -26,7 +26,6 @@ function SignupForm() {
             <form action={signinWithGoogle}>
               <OAuthButton logo={<GoogleIcon />}><span className="text-[15px] font-bold">Sign up with Google</span></OAuthButton>
             </form>
-            {/* <OAuthButton logo={<AppleFilled width={30} height={30} />}>Sign up with Apple</OAuthButton> */}
             <div className="relative flex items-center justify-center before:absolute before:left-0 after:right-0 after:absolute before:bg-gray-700 before:h-[0.2px] before:w-[45%]  after:bg-gray-700 after:h-[0.2px] after:w-[45%]">
               <span className="relative ">or</span>
             </div>

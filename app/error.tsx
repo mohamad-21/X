@@ -13,7 +13,7 @@ function Error({
   console.error(error);
 
   return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center">
+    <div className="fixed inset-0 flex flex-col items-center justify-center z-10">
       <h1 className="text-xl mb-4 text-default-400">
         Something went wrong. try reloading.
       </h1>

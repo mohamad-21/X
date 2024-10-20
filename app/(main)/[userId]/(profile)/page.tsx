@@ -1,4 +1,3 @@
-import { auth } from "@/app/_lib/auth";
 import { getUserByUsername } from "@/app/_lib/actions";
 import TwittsList from "@/app/_ui/TwittsList";
 import { Metadata } from "next";

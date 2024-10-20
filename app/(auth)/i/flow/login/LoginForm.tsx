@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import OAuthButton from "@/app/_ui/OAuthButton";
 import GoogleIcon from "@/app/_ui/GoogleIcon";
-import { AppleFilled } from "@ant-design/icons";
 import { Button, Input, ModalBody } from "@nextui-org/react";
 import { checkExistsUserByEmailUsername, signinWithGoogle } from "@/app/_lib/actions";
 import { useAppDispatch, useAppSelector } from "@/app/_lib/hooks";
@@ -35,7 +34,6 @@ export default function LoginForm({ onTransition }: { onTransition: (callback: (
               <form action={signinWithGoogle}>
                 <OAuthButton logo={<GoogleIcon />}><span className="text-[15px]">Sign in with Google</span></OAuthButton>
               </form>
-              <OAuthButton logo={<AppleFilled width={30} height={30} />}>Sign in with Apple</OAuthButton>
               <div className="relative flex items-center justify-center before:absolute before:left-0 after:right-0 after:absolute before:bg-gray-700 before:h-[0.2px] before:w-[45%]  after:bg-gray-700 after:h-[0.2px] after:w-[45%]">
                 <span className="relative ">or</span>
               </div>

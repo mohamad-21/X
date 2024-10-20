@@ -1,6 +1,6 @@
 import { getTwittComments } from "@/app/_lib/actions";
 import { auth } from "@/app/_lib/auth";
-import { getUserDetailsFromAPI } from "@/app/_lib/helpers";
+import { getUserDetailsFromAPI } from "@/app/_lib/actions";
 import TwittsList from "@/app/_ui/TwittsList";
 import React from "react";
 

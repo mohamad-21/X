@@ -103,12 +103,6 @@ function TwittsListWithRevalidation({
     }
   }, [twitts]);
 
-  useEffect(() => {
-    if (allTwitts) {
-      setTwitts(allTwitts);
-    }
-  }, [allTwitts]);
-
   const groupedTwitts = [];
   for (let i = 0; i < twitts.length; i += 3) {
     groupedTwitts.push(twitts.slice(i, i + 3));

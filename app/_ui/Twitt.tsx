@@ -48,7 +48,7 @@ type TwittProps = {
   user: UserWithFollows;
   setTwitts: React.Dispatch<React.SetStateAction<ITwitt[]>>;
   twitts: ITwitt[];
-  setIsActionOccurrs: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsActionOccurrs?: React.Dispatch<React.SetStateAction<boolean>>;
   mediaOnly?: boolean;
   isUserTwitts?: boolean;
   isRetwittAndInUserTwitts?: boolean;
@@ -92,7 +92,7 @@ function Twitt({
   }
 
   async function handleTwittLike() {
-    setIsActionOccurrs(true);
+    setIsActionOccurrs?.(true);
     const likeType = twitt.likes.some((like) => like == user.id!)
       ? ActionTypes.UNLIKE_TWITT
       : ActionTypes.LIKE_TWITT;
@@ -110,12 +110,12 @@ function Twitt({
     mutate('/api/twitts/comments');
     mutate('/api/user/twitts');
     setTimeout(() => {
-      setIsActionOccurrs(false);
+      setIsActionOccurrs?.(false);
     }, 1500);
   }
 
   async function handleRetwitt() {
-    setIsActionOccurrs(true);
+    setIsActionOccurrs?.(true);
     const isAlreadyRetwitted = twitt.retwitts.some(retwitt => retwitt == user.id);
     setTwitts(prev => prev.map(state => {
       if (state.id === twitt.id) {
@@ -138,7 +138,7 @@ function Twitt({
     mutate('/api/twitts/comments');
     mutate('/api/user/twitts');
     setTimeout(() => {
-      setIsActionOccurrs(false);
+      setIsActionOccurrs?.(false);
     }, 1500);
   }
 

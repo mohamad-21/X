@@ -18,7 +18,7 @@ type TwittsListProps = {
 };
 
 function TwittsList({
-  user: initialUser,
+  user,
   allTwitts,
   mediaOnly = false,
   userId,
@@ -26,11 +26,34 @@ function TwittsList({
   twittId,
   type,
 }: TwittsListProps) {
+  return noRevalidate ? <TwittsListWithoutRevalidation
+    user={user}
+    allTwitts={allTwitts}
+    mediaOnly={false}
+    userId={userId}
+  /> : <TwittsListWithRevalidation
+    user={user}
+    allTwitts={allTwitts}
+    mediaOnly={false}
+    userId={userId}
+    twittId={twittId}
+    type={type} />
+}
+
+function TwittsListWithRevalidation({
+  user: initialUser,
+  allTwitts,
+  mediaOnly = false,
+  userId,
+  twittId,
+  type,
+}: TwittsListProps) {
+
   const [user, setUser] = useState(initialUser);
   const dispatch = useDispatch();
   const [twitts, setTwitts] = useState(allTwitts);
   const [isActionOccurrs, setIsActionOccurrs] = useState(false);
-  const { data: updatedTwitts, isLoading, isValidating } = !noRevalidate ? useSWR<ITwitt[]>(
+  const { data: updatedTwitts, isLoading, isValidating } = useSWR<ITwitt[]>(
     `${type === "comments"
       ? "/api/twitts/comments"
       : (
@@ -56,19 +79,17 @@ function TwittsList({
     {
       refreshInterval: 7000,
     }
-  ) : { data: null, isLoading: null, isValidating: null };
-  if (!noRevalidate) {
-    useSWR<UserWithFollows>('/api/user/details', async () => {
-      const resp = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/user/details?id=${user.id}`);
-      const data = await resp.json();
-      if (data) {
-        setUser(data);
-      }
-      return data;
-    }, {
-      refreshInterval: 10000
-    });
-  }
+  );
+  useSWR<UserWithFollows>('/api/user/details', async () => {
+    const resp = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/user/details?id=${user.id}`);
+    const data = await resp.json();
+    if (data) {
+      setUser(data);
+    }
+    return data;
+  }, {
+    refreshInterval: 10000
+  });
 
   useEffect(() => {
     if (!isActionOccurrs && updatedTwitts && !isValidating && !isLoading) {
@@ -123,6 +144,73 @@ function TwittsList({
               twitt={twitt}
               setTwitts={setTwitts}
               setIsActionOccurrs={setIsActionOccurrs}
+              twitts={twitts}
+              isUserTwitts={Boolean(userId)}
+              isRetwittAndInUserTwitts={Boolean(userId && twitt.isRetwitt)}
+              mediaOnly={mediaOnly}
+            />
+          ))}
+        </>
+      )}
+    </div>
+  );
+}
+
+function TwittsListWithoutRevalidation({
+  user,
+  allTwitts,
+  mediaOnly = false,
+  userId,
+}: TwittsListProps) {
+
+  const dispatch = useDispatch();
+  const [twitts, setTwitts] = useState(allTwitts);
+
+  useEffect(() => {
+    if (twitts) {
+      dispatch(setTwittsSlice(twitts));
+    }
+  }, [twitts]);
+
+  useEffect(() => {
+    if (allTwitts) {
+      setTwitts(allTwitts);
+    }
+  }, [allTwitts]);
+
+  const groupedTwitts = [];
+  for (let i = 0; i < twitts.length; i += 3) {
+    groupedTwitts.push(twitts.slice(i, i + 3));
+  }
+
+  return (
+    <div className={`overflow-hidden w-full min-h-[100dvh]`}>
+      {mediaOnly ? (
+        <>
+          {groupedTwitts?.map((group, idx) => (
+            <div key={idx} className="flex gap-1">
+              {group.map((twitt) => (
+                <div className="w-[33.33%]" key={twitt.id}>
+                  <Twitt
+                    user={user}
+                    twitt={twitt}
+                    setTwitts={setTwitts}
+                    twitts={twitts}
+                    mediaOnly={mediaOnly}
+                  />
+                </div>
+              ))}
+            </div>
+          ))}
+        </>
+      ) : (
+        <>
+          {(userId ? [...twitts.filter(twitt => twitt.is_pinned === 1), ...twitts.filter(twitt => twitt.is_pinned === 0)] : twitts).map(twitt => (
+            <Twitt
+              user={user}
+              key={twitt.id}
+              twitt={twitt}
+              setTwitts={setTwitts}
               twitts={twitts}
               isUserTwitts={Boolean(userId)}
               isRetwittAndInUserTwitts={Boolean(userId && twitt.isRetwitt)}

@@ -2,6 +2,7 @@ import { getUserById, getUserDetailsFromAPI } from "@/app/_lib/actions";
 import { Metadata } from "next";
 import TwittsList from "@/app/_ui/TwittsList";
 import { notFound } from "next/navigation";
+import { auth } from "@/app/_lib/auth";
 
 export async function generateMetadata({ params }: { params: { userId: string } }): Promise<Metadata | void> {
   const user = await getUserById(params.userId);
@@ -13,6 +14,7 @@ export async function generateMetadata({ params }: { params: { userId: string } 
 }
 
 async function Page({ params }: { params: { userId: string } }) {
+  const session = await auth();
   const user = await getUserDetailsFromAPI(params.userId);
 
   if (!user) notFound();
@@ -24,7 +26,7 @@ async function Page({ params }: { params: { userId: string } }) {
       ) : (
         <div className="mx-auto max-w-xs">
           <h1 className="text-3xl font-extrabold mb-1">
-            {params.userId === user.username ? "You hasn't posted media" : `@${params.userId}hasn't posted media`}
+            {params.userId === session!.user.username ? "You hasn't posted media" : `@${params.userId}hasn't posted media`}
           </h1>
           <p className="text-default-400">
             Once {params.userId === user.username ? "you" : `they`} do, those posts will show up here.

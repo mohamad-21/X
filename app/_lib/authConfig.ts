@@ -64,6 +64,10 @@ export const authConfig: NextAuthConfig = {
       if (!["/", "/i/flow/login", "/i/flow/signup", "/i/flow/password_reset"].includes(request.nextUrl.pathname) && !auth?.user) {
         return NextResponse.redirect(new URL('/', request.url));
       }
+
+      if (["/", "/i/flow/login", "/i/flow/signup", "/i/flow/password_reset"].includes(request.nextUrl.pathname) && auth?.user) {
+        return NextResponse.redirect(new URL('/home', request.url));
+      }
       const requestHeaders = new Headers(request.headers);
       requestHeaders.set('x-pathname', request.nextUrl.pathname);
 

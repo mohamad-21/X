@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import useSWR from "swr";
 import Twitt from "./Twitt";
+import { usePathname, useRouter } from "next/navigation";
 
 type TwittsListProps = {
   user: UserData;
@@ -93,6 +94,12 @@ function TwittsListWithRevalidation({
   }, {
     refreshInterval: 10000
   });
+  const pathname = usePathname();
+  const router = useRouter();
+
+  useEffect(() => {
+    router.refresh();
+  }, [pathname]);
 
   useEffect(() => {
     if (!isActionOccurrs && updatedTwitts) {

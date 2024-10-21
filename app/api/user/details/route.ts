@@ -1,5 +1,4 @@
 import { getUserBookmarks, getUserById, getUserFollowersAndFollowings } from "@/app/_lib/actions";
-import { User, UserData } from "@/app/_lib/definitions";
 import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = 'force-dynamic';

@@ -97,7 +97,7 @@ function Navigation({ user }: { user: SessionUser }) {
 
   return (
     <>
-      <ul className="hidden sm:flex flex-col xl:items-stretch items-center gap-1 w-full max-w-[235px]">
+      <ul className="hidden sm:flex flex-col xl:items-stretch items-center gap-2 w-full max-w-[235px]">
         {/* <li>
           <Button as={Link} href="/home" size="lg" isIconOnly className=" flex hover:no-underline min-w-max items-center xl:px-3 justify-center gap-4 text-xl" variant="light" radius="full">
             <Logo width={30} height={30} />

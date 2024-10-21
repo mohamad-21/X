@@ -2,6 +2,7 @@
 
 import React, { Key, useTransition } from "react";
 import {
+  bookmarkTwitt,
   deleteTwitt,
   follow,
   increaseTwittView,
@@ -9,6 +10,7 @@ import {
   pinTwittToProfile,
   removePostRetwitt,
   retwittPost,
+  unBookmarkTwitt,
   unFollow,
   unpinTwittFromProfile,
 } from "@/app/_lib/actions";
@@ -42,12 +44,13 @@ const numeral = require("numeral");
 
 function Twitt({
   data,
-  user,
+  user: initialUser,
 }: {
   data: ITwitt & { follows: UserFollowingsAndFollowers };
   user: UserData;
 }) {
   const [twitt, setTwitt] = useState(data);
+  const [user, setUser] = useState(initialUser);
   const [isActionOccurrs, setIsActionOccurrs] = useState(false);
   const [followingText, setFollowingText] = useState("Following");
   const [imageSize, setSmageSize] = useState({
@@ -60,7 +63,7 @@ function Twitt({
   const router = useRouter();
   const { mutate } = useSWRConfig();
   const { update } = useSession();
-  const { data: updatedTwitt, isLoading, isValidating } = useSWR<ITwitt & { follows: UserFollowingsAndFollowers }>(
+  const { data: updatedTwitt } = useSWR<ITwitt & { follows: UserFollowingsAndFollowers }>(
     `/api/twitt`,
     async () => {
       const resp = await fetch(`/api/twitts/${twitt.id}`);
@@ -71,6 +74,13 @@ function Twitt({
       refreshInterval: 10000,
     }
   );
+  const { data: updatedUserDetails } = useSWR<UserData>('/api/user/details', async () => {
+    const resp = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/user/details?id=${user.id}`);
+    const data = await resp.json();
+    return data;
+  }, {
+    refreshInterval: 10000
+  });
 
   async function handleIncreaseView() {
     if (twitt.views.some(view => view == user.id)) return;
@@ -106,6 +116,23 @@ function Twitt({
     setTimeout(() => {
       setIsActionOccurrs(false);
     }, 1500);
+  }
+
+  async function handleBookmark() {
+    setIsActionOccurrs?.(true);
+    const hasAlreadyBookmarked = user.bookmarks.some(bookmark => bookmark.id == twitt.id);
+
+    if (hasAlreadyBookmarked) {
+      setUser?.(state => ({ ...state, bookmarks: state.bookmarks.filter(bookmark => bookmark.id !== twitt.id) }));
+      await unBookmarkTwitt({ user_id: user.id, twitt_id: twitt.id });
+    } else {
+      setUser?.(state => ({ ...state, bookmarks: [...state.bookmarks, twitt] }));
+      await bookmarkTwitt({ user_id: user.id, twitt_id: twitt.id });
+    }
+    mutate('/api/user/details');
+    setTimeout(() => {
+      setIsActionOccurrs?.(false);
+    }, 10000);
   }
 
   async function hanldeFollow() {
@@ -147,14 +174,16 @@ function Twitt({
   }
 
   useEffect(() => {
-    if (!isActionOccurrs && updatedTwitt && !isLoading && !isValidating) {
+    if (!isActionOccurrs && updatedTwitt) {
       setTwitt(updatedTwitt);
     }
-  }, [updatedTwitt, isActionOccurrs, isLoading, isValidating]);
+  }, [updatedTwitt, isActionOccurrs]);
 
   useEffect(() => {
-    setTwitt(data);
-  }, [data]);
+    if (!isActionOccurrs && updatedUserDetails) {
+      setUser(updatedUserDetails);
+    }
+  }, [updatedUserDetails, isActionOccurrs]);
 
   useEffect(() => {
     document.documentElement.scrollTop = 0;
@@ -271,6 +300,7 @@ function Twitt({
           onCommentsClick={() => {
             router.push(`/post?replyto=${twitt.id}`);
           }}
+          onBookmark={handleBookmark}
           onRetwitt={handleRetwitt}
           onLike={handleTwittLike}
           className="border-y border-y-default py-2"

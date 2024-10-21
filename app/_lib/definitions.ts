@@ -44,7 +44,8 @@ export interface UserFollowingsAndFollowers {
 }
 export interface UserData extends User {
   follows: UserFollowingsAndFollowers,
-  bookmarks: ITwitt[]
+  bookmarks: ITwitt[],
+  twitts: ITwitt[]
 }
 
 export type SessionUser = {

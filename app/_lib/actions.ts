@@ -121,37 +121,17 @@ export async function getTwittComments(twitt_id: number | string) {
   return comments;
 }
 
-export async function getUserByUsername(
-  username: string,
-  twittsWithReply: boolean = false
-): Promise<(User & { twitts: ITwitt[], follows: UserFollowingsAndFollowers }) | null> {
-  const result = await query<User[]>("select * from users where username = ?", [
-    username,
-  ]);
-
-  if (result.length < 1) return null;
-  const [userTwitts, follows] = await Promise.all([
-    getAlltwitts({
-      byUsername: true,
-      username,
-      with_reply: twittsWithReply,
-    }),
-    getUserFollowersAndFollowings(result[0].id)
-  ])
-
-  return {
-    ...result[0],
-    twitts: userTwitts,
-    follows
-  };
-}
-
 export async function getUserById(
   id: number | string,
-  twittsWithReply: boolean = false,
-  mediaOnly: boolean = false
-): Promise<(User & { twitts: ITwitt[] }) | null> {
-  const result = await query<User[]>("select * from users where id = ?", [id]);
+  {
+    twittsWithReply,
+    mediaOnly
+  }: {
+    twittsWithReply?: boolean,
+    mediaOnly?: boolean
+  } = {}
+) {
+  const result = await query<User[]>("select * from users where id = ? or username = ?", [id, id]);
 
   if (result.length < 1) return null;
   const userTwitts = mediaOnly ? await getUserTwittsByMedia(id) : await getAlltwitts({
@@ -166,8 +146,21 @@ export async function getUserById(
   };
 }
 
-export async function getUserDetailsFromAPI(id: number | string) {
-  const resp = await fetch(`${process.env.AUTH_URL}/api/user/details?id=${id}`);
+export async function getUserDetailsFromAPI(id: number | string, {
+  twittsWithReply,
+  mediaOnly
+}: {
+  twittsWithReply?: boolean,
+  mediaOnly?: boolean
+} = {}) {
+  let twittsType = '';
+  if (twittsWithReply) {
+    twittsType = 'with_reply';
+  }
+  if (mediaOnly) {
+    twittsType = 'media_only';
+  }
+  const resp = await fetch(`${process.env.AUTH_URL}/api/user/details?id=${id}${twittsType ? `twitts_type=${twittsType}` : ''}`);
   const data: UserData = await resp.json();
   return data;
 }

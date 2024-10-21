@@ -1,5 +1,5 @@
 import React from "react";
-import { getUserByUsername, getUserFollowersAndFollowings } from "@/app/_lib/actions";
+import { getUserById, getUserFollowersAndFollowings } from "@/app/_lib/actions";
 import { auth } from "@/app/_lib/auth";
 import UserProfile from "./UserProfile";
 import { notFound } from "next/navigation";
@@ -7,7 +7,7 @@ import { notFound } from "next/navigation";
 async function Layout({ children, modal, params }: { children: React.ReactNode, modal: React.ReactNode, params: { userId: string } }) {
   const [session, user] = await Promise.all([
     auth(),
-    getUserByUsername(params.userId),
+    getUserById(params.userId),
   ]);
   if (!user) notFound();
 

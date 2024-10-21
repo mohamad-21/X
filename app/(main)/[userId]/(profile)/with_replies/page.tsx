@@ -1,11 +1,10 @@
+import { getUserById, getUserDetailsFromAPI } from "@/app/_lib/actions";
+import TwittsList from "@/app/_ui/TwittsList";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getUserByUsername } from "@/app/_lib/actions";
-import TwittsList from "@/app/_ui/TwittsList";
-import { auth } from "@/app/_lib/auth";
 
 export async function generateMetadata({ params }: { params: { userId: string } }): Promise<Metadata | void> {
-  const user = await getUserByUsername(params.userId);
+  const user = await getUserById(params.userId);
   if (user) {
     return {
       title: `Posts with replies by ${user.name}`
@@ -14,7 +13,7 @@ export async function generateMetadata({ params }: { params: { userId: string } 
 }
 
 async function Page({ params }: { params: { userId: string } }) {
-  const user = await getUserByUsername(params.userId, true);
+  const user = await getUserDetailsFromAPI(params.userId, { twittsWithReply: true });
   if (!user) notFound();
 
   return (

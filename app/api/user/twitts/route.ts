@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     const include_replies = request.nextUrl.searchParams.get('include_replies');
     const mediaOnly = request.nextUrl.searchParams.get('media_only');
     if (!userId) return NextResponse.json({ message: 'id parameter is not set' }, { status: 400 });
-    const user = await getUserById(userId, true, mediaOnly ? true : false);
+    const user = await getUserById(userId, { twittsWithReply: true, mediaOnly: Boolean(mediaOnly) });
 
     if (!user) {
       return NextResponse.json({

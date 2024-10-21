@@ -7,9 +7,10 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
   try {
     const userId = request.nextUrl.searchParams.get('id');
+    const twittsType = request.nextUrl.searchParams.get('twitts_type') || '';
     if (!userId) return NextResponse.json({ message: 'id parameter is not set' }, { status: 400 });
     const [user, follows, bookmarks] = await Promise.all([
-      getUserById(userId),
+      getUserById(userId, { twittsWithReply: twittsType === 'with_reply', mediaOnly: twittsType === 'media_only' }),
       getUserFollowersAndFollowings(userId),
       getUserBookmarks(userId)
     ]);

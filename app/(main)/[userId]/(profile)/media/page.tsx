@@ -1,12 +1,10 @@
-import { auth } from "@/app/_lib/auth";
-import { getUserByUsername } from "@/app/_lib/actions";
-import { getUserTwittsByMedia } from '@/app/_lib/actions';
+import { getUserById, getUserDetailsFromAPI } from "@/app/_lib/actions";
 import { Metadata } from "next";
 import TwittsList from "@/app/_ui/TwittsList";
 import { notFound } from "next/navigation";
 
 export async function generateMetadata({ params }: { params: { userId: string } }): Promise<Metadata | void> {
-  const user = await getUserByUsername(params.userId);
+  const user = await getUserById(params.userId);
   if (user) {
     return {
       title: `Media Posts by ${user.name}`
@@ -15,17 +13,14 @@ export async function generateMetadata({ params }: { params: { userId: string } 
 }
 
 async function Page({ params }: { params: { userId: string } }) {
-  const [userTwitts, user] = await Promise.all([
-    getUserTwittsByMedia(params.userId),
-    getUserByUsername(params.userId)
-  ]);
+  const user = await getUserDetailsFromAPI(params.userId);
 
   if (!user) notFound();
 
   return (
     <div className="px-1 py-6">
-      {userTwitts.length > 0 ? (
-        <TwittsList mediaOnly userId={user.id} user={user} allTwitts={userTwitts} />
+      {user.twitts.length > 0 ? (
+        <TwittsList mediaOnly userId={user.id} user={user} allTwitts={user.twitts} />
       ) : (
         <div className="mx-auto max-w-xs">
           <h1 className="text-3xl font-extrabold mb-1">

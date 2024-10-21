@@ -71,6 +71,8 @@ export async function getAlltwitts({
     ].sort((a, b) => b.created_at.getTime() - a.created_at.getTime());
   }
 
+  console.log('getting twitts');
+
   return allTwitts;
 }
 

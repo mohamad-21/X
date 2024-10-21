@@ -29,12 +29,12 @@ function TwittsList({
   return noRevalidate ? <TwittsListWithoutRevalidation
     user={user}
     allTwitts={allTwitts}
-    mediaOnly={false}
+    mediaOnly={mediaOnly}
     userId={userId}
   /> : <TwittsListWithRevalidation
     user={user}
     allTwitts={allTwitts}
-    mediaOnly={false}
+    mediaOnly={mediaOnly}
     userId={userId}
     twittId={twittId}
     type={type} />

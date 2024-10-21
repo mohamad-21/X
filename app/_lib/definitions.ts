@@ -42,7 +42,7 @@ export interface UserFollowingsAndFollowers {
   followers: number[],
   followings: number[]
 }
-export interface UserData extends User {
+export interface UserData extends Omit<User, "password"> {
   follows: UserFollowingsAndFollowers,
   bookmarks: ITwitt[],
   twitts: ITwitt[]

@@ -1,4 +1,5 @@
 import { getUserById, getUserDetailsFromAPI } from "@/app/_lib/actions";
+import { UserData } from "@/app/_lib/definitions";
 import TwittsList from "@/app/_ui/TwittsList";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -11,9 +12,8 @@ export async function generateMetadata({ params }: { params: { userId: string } 
 }
 
 async function Page({ params }: { params: { userId: string } }) {
-  const user = await getUserDetailsFromAPI(params.userId);
+  const user: UserData = await getUserDetailsFromAPI(params.userId);
   if (!user) notFound();
-
   return (
     <TwittsList user={user} allTwitts={user.twitts} userId={user.id} type="without_replies" />
   )

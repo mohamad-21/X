@@ -71,8 +71,6 @@ export async function getAlltwitts({
     ].sort((a, b) => b.created_at.getTime() - a.created_at.getTime());
   }
 
-  console.log('getting twitts');
-
   return allTwitts;
 }
 
@@ -132,7 +130,6 @@ export async function getUserById(
   } = {}
 ) {
   const result = await query<User[]>("select * from users where id = ? or username = ?", [id, id]);
-
   if (result.length < 1) return null;
   const userTwitts = mediaOnly ? await getUserTwittsByMedia(id) : await getAlltwitts({
     byUsername: true,
@@ -160,7 +157,7 @@ export async function getUserDetailsFromAPI(id: number | string, {
   if (mediaOnly) {
     twittsType = 'media_only';
   }
-  const resp = await fetch(`${process.env.AUTH_URL}/api/user/details?id=${id}${twittsType ? `twitts_type=${twittsType}` : ''}`);
+  const resp = await fetch(`${process.env.AUTH_URL}/api/user/details?id=${id}${twittsType ? `&twitts_type=${twittsType}` : ''}`);
   const data: UserData = await resp.json();
   return data;
 }

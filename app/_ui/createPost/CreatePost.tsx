@@ -1,7 +1,7 @@
 "use client";
 
 import { addTwitt } from "@/app/_lib/actions";
-import { AddTwitt, ITwitt, SessionUser, User } from "@/app/_lib/definitions";
+import { AddTwitt, ITwitt, SessionUser, User, UserData } from "@/app/_lib/definitions";
 import { useAppSelector, useModalProps } from "@/app/_lib/hooks";
 import LoadingSpinner from "@/app/_ui/LoadingSpinner";
 import { GiphyFetch, ICategory } from "@giphy/js-fetch-api";
@@ -40,7 +40,7 @@ import Alert from "@/app/_ui/Alert";
 import { uploadFiles } from "@/app/_lib/uploadthing";
 
 type Props = {
-  user: User;
+  user: UserData;
   asModal?: boolean;
   rows?: number;
   noPadding?: boolean;

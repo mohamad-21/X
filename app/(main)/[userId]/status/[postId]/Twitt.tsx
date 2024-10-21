@@ -15,7 +15,7 @@ import {
 import {
   ITwitt,
   UserFollowingsAndFollowers,
-  UserWithFollows,
+  UserData,
 } from "@/app/_lib/definitions";
 import CreatePost from "@/app/_ui/createPost/CreatePost";
 import { ActionTypes } from "@/app/_ui/Twitt";
@@ -45,7 +45,7 @@ function Twitt({
   user,
 }: {
   data: ITwitt & { follows: UserFollowingsAndFollowers };
-  user: UserWithFollows;
+  user: UserData;
 }) {
   const [twitt, setTwitt] = useState(data);
   const [isActionOccurrs, setIsActionOccurrs] = useState(false);

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { GoHomeFill, GoHome } from "react-icons/go";
+import { GoHomeFill, GoHome, GoBookmark, GoBookmarkFill } from "react-icons/go";
 import { Button } from "@nextui-org/button";
 import { IoIosSearch, } from "react-icons/io";
 import Link from "next/link";
@@ -19,13 +19,14 @@ function BottomNavigation({ user }: { user: SessionUser }) {
   const [message, setMessage] = useState('');
   const pathname = usePathname();
   const notifs = useAppSelector(state => state.app.notifications);
+
   const links = [
     {
       href: '/home',
       text: 'Home',
       logo: {
-        outline: <GoHome size={25} />,
-        filled: <GoHomeFill size={25} />,
+        outline: <GoHome size={30} />,
+        filled: <GoHomeFill size={30} />,
       },
       disabled: false
     },
@@ -33,8 +34,8 @@ function BottomNavigation({ user }: { user: SessionUser }) {
       href: '/search',
       text: 'Search',
       logo: {
-        outline: <IoIosSearch size={25} />,
-        filled: <IoIosSearch size={25} />,
+        outline: <IoIosSearch size={30} />,
+        filled: <IoIosSearch size={30} />,
       },
       disabled: true
     },
@@ -42,30 +43,48 @@ function BottomNavigation({ user }: { user: SessionUser }) {
       href: '/notifications',
       text: 'Notifications',
       logo: {
-        outline: <IoNotificationsOutline size={25} />,
+        outline: <IoNotificationsOutline size={30} />,
 
-        filled: <IoNotifications size={25} />,
+        filled: <IoNotifications size={30} />,
       },
       disabled: false
     },
     {
-      href: '/messages',
-      text: 'Messages',
+      href: `/bookmarks`,
+      text: 'Bookmarks',
       logo: {
-        outline: <IoMailOutline size={25} />,
-        filled: <IoMail size={25} />,
+        outline: <GoBookmark size={30} />,
+        filled: <GoBookmarkFill size={20} />,
       },
-      disabled: true
+      disabled: false
     },
+    // {
+    //   href: '/messages',
+    //   text: 'Messages',
+    //   logo: {
+    //     outline: <IoMailOutline size={30} />,
+    //     filled: <IoMail size={30} />,
+    //   },
+    //   disabled: true
+    // },
     {
       href: `/${user.username}`,
       text: 'Profile',
       logo: {
-        outline: <BiUser size={25} />,
-        filled: <BiSolidUser size={25} />,
+        outline: <BiUser size={30} />,
+        filled: <BiSolidUser size={30} />,
       },
       disabled: false
     },
+    // {
+    //   href: null,
+    //   text: 'More',
+    //   logo: {
+    //     outline: <PiDotsThreeCircleLight size={30} />,
+    //     filled: <PiDotsThreeCircleLight size={30} />
+    //   },
+    //   disabled: true
+    // },
   ]
 
   useEffect(() => {

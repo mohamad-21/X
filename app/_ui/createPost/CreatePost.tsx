@@ -136,12 +136,12 @@ function CreatePost({
       if (gif) twittData.gif = gif;
       if (replyTo) twittData.replyTo = replyTo.id;
 
-      const { error, insertId } = await addTwitt(twittData);
+      const { error } = await addTwitt(twittData);
       if (error) {
         return setError(error.message);
       }
       if (replyTo) {
-        return router.push(`/${user.username}/status/${insertId}`);
+        return router.push(`/${user.username}/status`);
       }
       mutate("/api/twitts");
       mutate("/api/twitt");

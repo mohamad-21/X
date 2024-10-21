@@ -13,7 +13,7 @@ import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { LuUserPlus } from "react-icons/lu";
 import { MdBlock, MdOutlinePushPin } from "react-icons/md";
 import { RiPagesLine } from "react-icons/ri";
-import { ITwitt, SessionUser, User, UserWithFollows } from "@/app/_lib/definitions";
+import { ITwitt, SessionUser, User, UserData } from "@/app/_lib/definitions";
 
 function TwittSettings({
   onMenuAction,
@@ -22,7 +22,7 @@ function TwittSettings({
 }: {
   onMenuAction: (e: Key) => void;
   twitt: ITwitt;
-  user: UserWithFollows;
+  user: UserData;
 }) {
   return (
     <Dropdown>
@@ -84,7 +84,12 @@ function TwittSettings({
         >
           Block @{twitt.username}
         </DropdownItem>
-        <DropdownItem key={twitt.is_pinned ? 'unpin' : 'pin'} startContent={<MdOutlinePushPin />}>
+        <DropdownItem
+          key={twitt.is_pinned ? 'unpin' : 'pin'}
+          startContent={<MdOutlinePushPin />}
+          className={`${user.id != twitt.user_id ? "hidden" : ""}`}
+          hidden={twitt.user_id != user.id}
+        >
           {twitt.is_pinned ? "Unpin to your profile" : "Pin to your profile"}
         </DropdownItem>
         <DropdownItem key="highlight" startContent={<BsStars />}>

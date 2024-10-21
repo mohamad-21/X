@@ -1,4 +1,5 @@
 import {
+  bookmarkTwitt,
   deleteTwitt,
   follow,
   increaseTwittView,
@@ -6,10 +7,11 @@ import {
   pinTwittToProfile,
   removePostRetwitt,
   retwittPost,
+  unBookmarkTwitt,
   unFollow,
   unpinTwittFromProfile,
 } from "@/app/_lib/actions";
-import { ITwitt, UserWithFollows } from "@/app/_lib/definitions";
+import { ITwitt, UserData } from "@/app/_lib/definitions";
 import { useIsVisible } from "@/app/_lib/hooks";
 import { optimizedText } from "@/app/_utils/optimizedText";
 import { MediaPlayer, MediaProvider } from "@vidstack/react";
@@ -45,13 +47,15 @@ export const ActionTypes = {
 
 type TwittProps = {
   twitt: ITwitt;
-  user: UserWithFollows;
+  user: UserData;
   setTwitts: React.Dispatch<React.SetStateAction<ITwitt[]>>;
   twitts: ITwitt[];
   setIsActionOccurrs?: React.Dispatch<React.SetStateAction<boolean>>;
   mediaOnly?: boolean;
   isUserTwitts?: boolean;
   isRetwittAndInUserTwitts?: boolean;
+  setUser?: React.Dispatch<React.SetStateAction<UserData>>;
+  isBookmarksList?: boolean
 };
 
 function Twitt({
@@ -62,7 +66,9 @@ function Twitt({
   setIsActionOccurrs,
   mediaOnly,
   isUserTwitts,
-  isRetwittAndInUserTwitts
+  isRetwittAndInUserTwitts,
+  setUser,
+  isBookmarksList
 }: TwittProps) {
   const [imageSize, setSmageSize] = useState({
     width: 0,
@@ -111,7 +117,7 @@ function Twitt({
     mutate('/api/user/twitts');
     setTimeout(() => {
       setIsActionOccurrs?.(false);
-    }, 1500);
+    }, 7000);
   }
 
   async function handleRetwitt() {
@@ -139,7 +145,27 @@ function Twitt({
     mutate('/api/user/twitts');
     setTimeout(() => {
       setIsActionOccurrs?.(false);
-    }, 1500);
+    }, 7000);
+  }
+
+  async function handleBookmark() {
+    setIsActionOccurrs?.(true);
+    const hasAlreadyBookmarked = user.bookmarks.some(bookmark => bookmark.id == twitt.id);
+
+    if (hasAlreadyBookmarked) {
+      setUser?.(state => ({ ...state, bookmarks: state.bookmarks.filter(bookmark => bookmark.id !== twitt.id) }));
+      if (isBookmarksList) {
+        setHide(true);
+      }
+      await unBookmarkTwitt({ user_id: user.id, twitt_id: twitt.id });
+    } else {
+      setUser?.(state => ({ ...state, bookmarks: [...state.bookmarks, twitt] }));
+      await bookmarkTwitt({ user_id: user.id, twitt_id: twitt.id });
+    }
+    mutate('/api/user/details');
+    setTimeout(() => {
+      setIsActionOccurrs?.(false);
+    }, 10000);
   }
 
   function handleTwittClick(e: React.MouseEvent<any>) {
@@ -312,6 +338,7 @@ function Twitt({
                 }}
                 onRetwitt={handleRetwitt}
                 onLike={handleTwittLike}
+                onBookmark={handleBookmark}
                 className="-ml-2 to-twitt"
               />
             </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { ITwitt, UserWithFollows } from "@/app/_lib/definitions";
+import { ITwitt, UserData } from "@/app/_lib/definitions";
 import { setTwitts as setTwittsSlice } from "@/app/_lib/slices/appSlice";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -8,13 +8,14 @@ import useSWR from "swr";
 import Twitt from "./Twitt";
 
 type TwittsListProps = {
-  user: UserWithFollows;
+  user: UserData;
   allTwitts: ITwitt[];
   mediaOnly?: boolean;
   userId?: number | string;
   twittId?: number | string;
   noRevalidate?: boolean;
   type?: "without_replies" | "with_replies" | "comments";
+  isBookmarksList?: boolean
 };
 
 function TwittsList({
@@ -25,19 +26,23 @@ function TwittsList({
   noRevalidate,
   twittId,
   type,
+  isBookmarksList
 }: TwittsListProps) {
   return noRevalidate ? <TwittsListWithoutRevalidation
     user={user}
     allTwitts={allTwitts}
     mediaOnly={mediaOnly}
     userId={userId}
+    isBookmarksList={isBookmarksList}
   /> : <TwittsListWithRevalidation
     user={user}
     allTwitts={allTwitts}
     mediaOnly={mediaOnly}
     userId={userId}
     twittId={twittId}
-    type={type} />
+    type={type}
+    isBookmarksList={isBookmarksList}
+  />
 }
 
 function TwittsListWithRevalidation({
@@ -47,13 +52,14 @@ function TwittsListWithRevalidation({
   userId,
   twittId,
   type,
+  isBookmarksList
 }: TwittsListProps) {
 
   const [user, setUser] = useState(initialUser);
   const dispatch = useDispatch();
   const [twitts, setTwitts] = useState(allTwitts);
   const [isActionOccurrs, setIsActionOccurrs] = useState(false);
-  const { data: updatedTwitts, isLoading, isValidating } = useSWR<ITwitt[]>(
+  const { data: updatedTwitts } = useSWR<ITwitt[]>(
     `${type === "comments"
       ? "/api/twitts/comments"
       : (
@@ -80,22 +86,25 @@ function TwittsListWithRevalidation({
       refreshInterval: 7000,
     }
   );
-  useSWR<UserWithFollows>('/api/user/details', async () => {
+  const { data: updatedUserDetails } = useSWR<UserData>('/api/user/details', async () => {
     const resp = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/user/details?id=${user.id}`);
     const data = await resp.json();
-    if (data) {
-      setUser(data);
-    }
     return data;
   }, {
     refreshInterval: 10000
   });
 
   useEffect(() => {
-    if (!isActionOccurrs && updatedTwitts && !isValidating && !isLoading) {
+    if (!isActionOccurrs && updatedTwitts) {
       setTwitts(updatedTwitts);
     }
-  }, [isActionOccurrs, updatedTwitts, isLoading, isValidating]);
+  }, [isActionOccurrs, updatedTwitts]);
+
+  useEffect(() => {
+    if (!isActionOccurrs && updatedUserDetails) {
+      setUser(updatedUserDetails);
+    }
+  }, [isActionOccurrs, updatedUserDetails]);
 
   useEffect(() => {
     if (twitts) {
@@ -142,6 +151,8 @@ function TwittsListWithRevalidation({
               isUserTwitts={Boolean(userId)}
               isRetwittAndInUserTwitts={Boolean(userId && twitt.isRetwitt)}
               mediaOnly={mediaOnly}
+              setUser={setUser}
+              isBookmarksList={isBookmarksList}
             />
           ))}
         </>
@@ -155,6 +166,7 @@ function TwittsListWithoutRevalidation({
   allTwitts,
   mediaOnly = false,
   userId,
+  isBookmarksList
 }: TwittsListProps) {
 
   const dispatch = useDispatch();
@@ -209,6 +221,7 @@ function TwittsListWithoutRevalidation({
               isUserTwitts={Boolean(userId)}
               isRetwittAndInUserTwitts={Boolean(userId && twitt.isRetwitt)}
               mediaOnly={mediaOnly}
+              isBookmarksList={isBookmarksList}
             />
           ))}
         </>

@@ -1,8 +1,8 @@
 import React from "react";
 import Link from "next/link";
-import { User, UserWithFollows } from "../_lib/definitions";
+import { User, UserData } from "../_lib/definitions";
 
-function Header({ user }: { user: UserWithFollows }) {
+function Header({ user }: { user: UserData }) {
   return (
     <header className="sm:hidden sticky top-0 left-0 w-full flex items-center py-3 px-4 border-b border-default bg-background z-[3]">
       <div className="flex items-center justify-between w-full">

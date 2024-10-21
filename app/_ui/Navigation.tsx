@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Logo from "@/app/_ui/Logo";
-import { GoHomeFill, GoHome } from "react-icons/go";
+import { GoHomeFill, GoHome, GoBookmarkFill, GoBookmark } from "react-icons/go";
 import { PiDotsThreeCircleLight } from "react-icons/pi";
 import { Button } from "@nextui-org/button";
 import { IoIosSearch, } from "react-icons/io";
@@ -52,14 +52,23 @@ function Navigation({ user }: { user: SessionUser }) {
       disabled: false
     },
     {
-      href: '/messages',
-      text: 'Messages',
+      href: `/bookmarks`,
+      text: 'Bookmarks',
       logo: {
-        outline: <IoMailOutline size={30} />,
-        filled: <IoMail size={30} />,
+        outline: <GoBookmark size={30} />,
+        filled: <GoBookmarkFill size={30} />,
       },
-      disabled: true
+      disabled: false
     },
+    // {
+    //   href: '/messages',
+    //   text: 'Messages',
+    //   logo: {
+    //     outline: <IoMailOutline size={30} />,
+    //     filled: <IoMail size={30} />,
+    //   },
+    //   disabled: true
+    // },
     {
       href: `/${user.username}`,
       text: 'Profile',
@@ -69,15 +78,15 @@ function Navigation({ user }: { user: SessionUser }) {
       },
       disabled: false
     },
-    {
-      href: null,
-      text: 'More',
-      logo: {
-        outline: <PiDotsThreeCircleLight size={30} />,
-        filled: <PiDotsThreeCircleLight size={30} />
-      },
-      disabled: true
-    },
+    // {
+    //   href: null,
+    //   text: 'More',
+    //   logo: {
+    //     outline: <PiDotsThreeCircleLight size={30} />,
+    //     filled: <PiDotsThreeCircleLight size={30} />
+    //   },
+    //   disabled: true
+    // },
   ]
 
   useEffect(() => {
@@ -88,7 +97,7 @@ function Navigation({ user }: { user: SessionUser }) {
 
   return (
     <>
-      <ul className="hidden sm:flex flex-col xl:items-stretch items-center gap-2 w-full max-w-[235px]">
+      <ul className="hidden sm:flex flex-col xl:items-stretch items-center gap-1 w-full max-w-[235px]">
         {/* <li>
           <Button as={Link} href="/home" size="lg" isIconOnly className=" flex hover:no-underline min-w-max items-center xl:px-3 justify-center gap-4 text-xl" variant="light" radius="full">
             <Logo width={30} height={30} />

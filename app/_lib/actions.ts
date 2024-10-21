@@ -17,7 +17,7 @@ import {
   User,
   UserFollowingsAndFollowers,
   UserFollowingsAndFollowersTable,
-  UserWithFollows,
+  UserData,
   Verification,
 } from "./definitions";
 import { sendMail } from "./sendMail";
@@ -168,7 +168,7 @@ export async function getUserById(
 
 export async function getUserDetailsFromAPI(id: number | string) {
   const resp = await fetch(`${process.env.AUTH_URL}/api/user/details?id=${id}`);
-  const data: UserWithFollows = await resp.json();
+  const data: UserData = await resp.json();
   return data;
 }
 
@@ -734,4 +734,25 @@ export async function removePostRetwitt({ user_id, twitt_id }: { user_id: number
     await query("delete from retwitts where user_id = ? and twitt_id = ?", [user_id, twitt_id]),
     await query("update twitts set retwitts = ? where id = ?", [`[${updatedPostRetwitts}]`, twitt_id]),
   ]);
+}
+
+export async function getUserBookmarks(user_id: number | string) {
+  const bookmarks = await query<{ id: number, user_id: number, twitt_id: number }[]>("select * from bookmarks where user_id = ?", [user_id]);
+
+  if (bookmarks.length < 1) {
+    return [];
+  }
+
+  const bookmarkIds = bookmarks.map(bookmark => bookmark.twitt_id);
+  const bookmarkedTwitts = await getTwittsByIds(bookmarkIds);
+
+  return bookmarkedTwitts;
+}
+
+export async function bookmarkTwitt({ user_id, twitt_id }: { user_id: number | string, twitt_id: number | string }) {
+  await query("insert into bookmarks(user_id, twitt_id) values(?, ?)", [user_id, twitt_id]);
+}
+
+export async function unBookmarkTwitt({ user_id, twitt_id }: { user_id: number | string, twitt_id: number | string }) {
+  await query("delete from bookmarks where user_id = ? and twitt_id = ?", [user_id, twitt_id]);
 }

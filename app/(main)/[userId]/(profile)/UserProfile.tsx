@@ -63,10 +63,6 @@ function UserProfile({ user, headerSubtitle, follows, sessionUser }: Props) {
   }
 
   useEffect(() => {
-    document.documentElement.scrollTop = 0;
-  }, []);
-
-  useEffect(() => {
     setProfileDetails({ ...user, follows });
   }, [user, follows]);
 

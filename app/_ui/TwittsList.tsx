@@ -95,6 +95,10 @@ function TwittsListWithRevalidation({
   });
 
   useEffect(() => {
+    document.documentElement.scrollTop = 0;
+  }, []);
+
+  useEffect(() => {
     if (!isActionOccurrs && updatedTwitts) {
       setTwitts(updatedTwitts);
     }

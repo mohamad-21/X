@@ -12,12 +12,12 @@ import { BiSolidUser, BiUser } from "react-icons/bi";
 import { IoNotifications, IoNotificationsOutline } from "react-icons/io5";
 import { IoMail, IoMailOutline } from "react-icons/io5";
 import { Badge, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/react";
-import { SessionUser } from "@/app/_lib/definitions";
+import { SessionUser, UserData } from "@/app/_lib/definitions";
 import { logOut } from "@/app/_lib/actions";
 import Alert from "./Alert";
 import { useAppSelector } from "@/app/_lib/hooks";
 
-function Navigation({ user }: { user: SessionUser }) {
+function Navigation({ user }: { user: UserData }) {
   const [message, setMessage] = useState('');
   const pathname = usePathname();
   const notifs = useAppSelector(state => state.app.notifications);
@@ -39,7 +39,7 @@ function Navigation({ user }: { user: SessionUser }) {
         outline: <IoIosSearch size={30} />,
         filled: <IoIosSearch size={30} />,
       },
-      disabled: true
+      disabled: false
     },
     {
       href: '/notifications',
@@ -165,7 +165,7 @@ function Navigation({ user }: { user: SessionUser }) {
           <DropdownTrigger>
             <Button variant="light" className="xl:py-8 sm:flex hidden xl:justify-start xl:px-3 justify-center items-center xl:w-full xl:max-w-[235px] xl:max-h-max w-11 h-11 min-w-0 px-0 rounded-full">
               <div className="flex items-center justify-center overflow-hidden gap-3">
-                <img width={44} height={44} alt={user?.name!} src={user.image} className="rounded-full w-11 h-11 flex-shrink-0" />
+                <img width={44} height={44} alt={user?.name!} src={user.profile} className="rounded-full w-11 h-11 flex-shrink-0" />
                 <div className="text-left xl:flex flex-col items-start justify-center hidden gap-0 truncate">
                   <h3 className="font-bold truncate max-w-full">{user.name}</h3>
                   <p className="text-darkgray truncate max-w-full">@{user.username}</p>

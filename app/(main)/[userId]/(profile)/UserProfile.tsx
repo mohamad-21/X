@@ -1,9 +1,10 @@
 "use client";
 
 import { follow, unFollow } from "@/app/_lib/actions";
-import { ITwitt, SessionUser, User, UserFollowingsAndFollowers } from "@/app/_lib/definitions";
+import { ITwitt, SessionUser, User, UserData, UserFollowingsAndFollowers } from "@/app/_lib/definitions";
 import { useAppDispatch, useRouteChangeTransition } from "@/app/_lib/hooks";
 import { setUserData } from "@/app/_lib/slices/userSlice";
+import FollowButton from "@/app/_ui/FollowButton";
 import PageHeader from "@/app/_ui/PageHeader";
 import { Button } from "@nextui-org/button";
 import { Card, Tab, Tabs } from "@nextui-org/react";
@@ -18,15 +19,14 @@ import { GrAttachment } from "react-icons/gr";
 import useSWR from "swr";
 
 type Props = {
-  user: User & { twitts: ITwitt[] },
+  user: UserData,
   headerSubtitle: string,
   follows: UserFollowingsAndFollowers,
-  sessionUser?: SessionUser
+  sessionUser?: UserData
 };
 
 function UserProfile({ user, headerSubtitle, follows, sessionUser }: Props) {
   const [profileDetails, setProfileDetails] = useState({ ...user, follows });
-  const [followingText, setFollowingText] = useState('Following');
   const changeRoute = useRouteChangeTransition();
   const pathname = usePathname();
   const [currentTab, setCurrentTab] = useState(() => {
@@ -37,8 +37,8 @@ function UserProfile({ user, headerSubtitle, follows, sessionUser }: Props) {
   const dispatch = useAppDispatch();
   const { update } = useSession();
 
-  useSWR<User & { follows: UserFollowingsAndFollowers }>(`/api/user/details`, async () => {
-    const resp = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/user/details?id=${user.id}`);
+  useSWR<User & { follows: UserFollowingsAndFollowers }>(`/api/user/info`, async () => {
+    const resp = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/user/info?id=${user.id}`);
     const data = await resp.json();
     setProfileDetails(data);
     return data;
@@ -61,6 +61,10 @@ function UserProfile({ user, headerSubtitle, follows, sessionUser }: Props) {
     update('trigger');
     await unFollow(sessionUser?.id!, user.id);
   }
+
+  useEffect(() => {
+    document.documentElement.scrollTop = 0;
+  }, []);
 
   useEffect(() => {
     setProfileDetails({ ...user, follows });
@@ -140,17 +144,7 @@ function UserProfile({ user, headerSubtitle, follows, sessionUser }: Props) {
                 Edit Profile
               </Button>
             ) : (
-              <>
-                {profileDetails.follows.followers.some(follower => follower == sessionUser?.id) ? (
-                  <Button variant="bordered" className="font-bold text-base hover:border-danger/75 hover:bg-danger/20 hover:text-danger" radius="full" onPointerEnter={() => setFollowingText("Unfollow")} onPointerLeave={() => setFollowingText("Following")} onClick={hanldeUnfollow}>
-                    {followingText}
-                  </Button>
-                ) : (
-                  <Button onClick={hanldeFollow} color="secondary" className="font-bold text-base" radius="full">
-                    Follow
-                  </Button>
-                )}
-              </>
+              <FollowButton isFollowing={profileDetails.follows.followers.some(follower => follower == sessionUser?.id)} onFollow={hanldeFollow} onUnfollow={hanldeUnfollow} />
             )}
           </div>
         </div>

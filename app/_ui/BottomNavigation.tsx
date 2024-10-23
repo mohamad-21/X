@@ -10,12 +10,12 @@ import { BiSolidUser, BiUser } from "react-icons/bi";
 import { IoNotifications, IoNotificationsOutline } from "react-icons/io5";
 import { IoMail, IoMailOutline } from "react-icons/io5";
 import { Badge } from "@nextui-org/react";
-import { SessionUser } from "@/app/_lib/definitions";
+import { SessionUser, UserData } from "@/app/_lib/definitions";
 import Alert from "./Alert";
 import { useAppSelector } from "../_lib/hooks";
 
 
-function BottomNavigation({ user }: { user: SessionUser }) {
+function BottomNavigation({ user }: { user: UserData }) {
   const [message, setMessage] = useState('');
   const pathname = usePathname();
   const notifs = useAppSelector(state => state.app.notifications);

@@ -7,6 +7,6 @@ export function useMutateAll() {
     mutate("/api/twitts");
     mutate("/api/twitts/comments");
     mutate("/api/user/twitts");
-    mutate("/api/user/details");
+    mutate("/api/user/info");
   }
 }

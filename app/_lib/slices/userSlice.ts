@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ITwitt, SignupData, User, UserFollowingsAndFollowers } from "@/app/_lib/definitions";
+import { ITwitt, SignupData, User, UserData, UserFollowingsAndFollowers } from "@/app/_lib/definitions";
 
 export type SignupSlice = {
   data: SignupData | null,
@@ -15,7 +15,7 @@ export type LoginSlice = {
 interface UserState {
   signup: SignupSlice
   login: LoginSlice,
-  user: User & { follows?: UserFollowingsAndFollowers, created_at: string, updated_at: string, twitts: ITwitt[] } | null,
+  user: UserData & { created_at: string, updated_at: string } | null,
   replyTo: ITwitt | null
 }
 

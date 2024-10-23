@@ -75,7 +75,7 @@ export async function getAlltwitts({
 }
 
 export async function getTwittsBySearch(searchTerm: string) {
-  const twitts = await query<ITwitt[]>("select twitts.id, twitts.text, twitts.media, twitts.created_at, twitts.media_type, twitts.likes, twitts.views, twitts.reply_to, twitts.comments, twitts.retwitts, twitts.is_pinned, users.id as user_id, users.username, users.name, users.profile as user_profile from twitts join users on twitts.user_id = users.id where text like ? and twitts.reply_to is null order by twitts.id desc", [`%${searchTerm}%`]);
+  const twitts = await query<ITwitt[]>("select twitts.id, twitts.text, twitts.media, twitts.created_at, twitts.media_type, twitts.likes, twitts.views, twitts.reply_to, twitts.comments, twitts.retwitts, twitts.is_pinned, users.id as user_id, users.username, users.name, users.profile as user_profile from twitts join users on twitts.user_id = users.id where lower(text) like ? and twitts.reply_to is null order by twitts.id desc", [`%${searchTerm.toLowerCase()}%`]);
   return twitts;
 }
 
@@ -123,32 +123,40 @@ export async function getUserById(
   id: number | string,
   {
     twittsWithReply,
-    mediaOnly
+    mediaOnly,
+    noTwitts
   }: {
     twittsWithReply?: boolean,
-    mediaOnly?: boolean
+    mediaOnly?: boolean,
+    noTwitts?: boolean
   } = {}
 ) {
   const result = await query<User[]>("select * from users where id = ? or username = ?", [id, id]);
   if (result.length < 1) return null;
+  // if (noTwitts) {
+  //   return result.length ? result[0] : null;
+  // }
   const userTwitts = mediaOnly ? await getUserTwittsByMedia(id) : await getAlltwitts({
     byUsername: true,
     username: result[0].username!,
     with_reply: twittsWithReply,
   });
-
+  const follows = await getUserFollowersAndFollowings(result[0].id);
   return {
     ...result[0],
     twitts: userTwitts,
+    follows
   };
 }
 
 export async function getUserDetailsFromAPI(id: number | string, {
   twittsWithReply,
-  mediaOnly
+  mediaOnly,
+  onlyDetails
 }: {
   twittsWithReply?: boolean,
-  mediaOnly?: boolean
+  mediaOnly?: boolean,
+  onlyDetails?: boolean
 } = {}) {
   let twittsType = '';
   if (twittsWithReply) {
@@ -157,7 +165,12 @@ export async function getUserDetailsFromAPI(id: number | string, {
   if (mediaOnly) {
     twittsType = 'media_only';
   }
-  const resp = await fetch(`${process.env.AUTH_URL}/api/user/details?id=${id}${twittsType ? `&twitts_type=${twittsType}` : ''}`);
+  const resp = await fetch(`${process.env.AUTH_URL}/api/user/info?id=${id}${twittsType ? `&twitts_type=${twittsType}` : ''}${onlyDetails ? '&full_data=false' : ''}`);
+
+  if (onlyDetails) {
+    const data: Omit<UserData, "twitts|bookmarks"> = await resp.json();
+    return data;
+  }
   const data: UserData = await resp.json();
   return data;
 }
@@ -226,6 +239,16 @@ export async function deleteTwitt(twitt_id: number | string) {
   }
   revalidatePath('/home');
   revalidatePath(`/${twitt[0].username}`, 'layout');
+}
+
+export async function getPeopleAndTwittsBySearch(searchTerm: string) {
+  const people = await query<User[]>("select * from users where lower(name) like ? or lower(username) like ?", [`%${searchTerm.toLowerCase()}%`, `%${searchTerm.toLowerCase()}%`]);
+  const twitts = await getTwittsBySearch(searchTerm);
+
+  return {
+    people,
+    twitts
+  }
 }
 
 export async function signinWithGoogle() {
@@ -709,7 +732,9 @@ export async function pushNotification({ user_id, opposite_id, type, place_id, t
   place_id?: number,
   text?: string,
 }) {
-  await query("insert into notifications(user_id, opposite_id, type, place_id, text) values(?,?,?,?,?)", [user_id, opposite_id || null, type || null, place_id || null, text || null]);
+  if (user_id != opposite_id) {
+    await query("insert into notifications(user_id, opposite_id, type, place_id, text) values(?,?,?,?,?)", [user_id, opposite_id || null, type || null, place_id || null, text || null]);
+  }
 }
 
 export async function retwittPost({ user_id, twitt_id }: { user_id: number | string, twitt_id: number | string }) {

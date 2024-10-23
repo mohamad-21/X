@@ -162,7 +162,7 @@ function Twitt({
       setUser?.(state => ({ ...state, bookmarks: [...state.bookmarks, twitt] }));
       await bookmarkTwitt({ user_id: user.id, twitt_id: twitt.id });
     }
-    mutate('/api/user/details');
+    mutate('/api/user/info');
     setTimeout(() => {
       setIsActionOccurrs?.(false);
     }, 10000);
@@ -181,11 +181,11 @@ function Twitt({
       setShowDeleteConfirm(true);
     } else if (key === "follow") {
       await follow(user.id, twitt.user_id);
-      mutate('/api/user/details');
+      mutate('/api/user/info');
       setMessage(`You're now following @${twitt.username}`);
     } else if (key === "unfollow") {
       await unFollow(user.id, twitt.user_id);
-      mutate('/api/user/details');
+      mutate('/api/user/info');
       setMessage(`@${twitt.username} now is not in your followings`);
     } else if (key === 'pin') {
       setMessage("Post pinned on your profile");

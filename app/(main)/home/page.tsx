@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 async function Page() {
   const session = await auth();
-  const resp = await fetch(`${process.env.AUTH_URL}/api/user/details?id=${session!.user.id}`);
+  const resp = await fetch(`${process.env.AUTH_URL}/api/user/info?id=${session!.user.id}`);
   if (!resp.ok) throw new Error(resp.statusText);
   const user: UserData = await resp.json();
 

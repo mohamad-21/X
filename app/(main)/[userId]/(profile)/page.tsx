@@ -14,6 +14,7 @@ export async function generateMetadata({ params }: { params: { userId: string } 
 async function Page({ params }: { params: { userId: string } }) {
   const user: UserData = await getUserDetailsFromAPI(params.userId);
   if (!user) notFound();
+
   return (
     <TwittsList user={user} allTwitts={user.twitts} userId={user.id} type="without_replies" />
   )

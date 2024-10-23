@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     template: '%s / X',
     default: 'X'
   },
-  description: "X social media platform portfolio",
+  description: "X social media portfolio",
   keywords: ['twitter', 'x', 'social media', 'chatroom', 'vercel x', 'vercel twitter']
 };
 

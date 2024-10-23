@@ -4,6 +4,7 @@ import { auth } from "@/app/_lib/auth";
 import BottomNavigation from "./BottomNavigation";
 import Navigation from "./Navigation";
 import NotificationsUpdater from "./NotificationsUpdater";
+import { getUserDetailsFromAPI } from "../_lib/actions";
 
 function SidebarWrapper() {
   return (
@@ -18,11 +19,13 @@ function SidebarWrapper() {
 async function Sidebar() {
   const session = await auth();
   if (!session) return;
+  const user = await getUserDetailsFromAPI(session!.user.id, { onlyDetails: true });
+
   return (
     <>
-      <Navigation user={session?.user!} />
+      <Navigation user={user} />
       <NotificationsUpdater />
-      <BottomNavigation user={session?.user!} />
+      <BottomNavigation user={user} />
     </>
   )
 }

@@ -86,17 +86,13 @@ function TwittsListWithRevalidation({
       refreshInterval: 7000,
     }
   );
-  const { data: updatedUserDetails } = useSWR<UserData>('/api/user/details', async () => {
-    const resp = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/user/details?id=${user.id}`);
+  const { data: updatedUserDetails } = useSWR<UserData>('/api/user/info', async () => {
+    const resp = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/user/info?id=${user.id}`);
     const data = await resp.json();
     return data;
   }, {
     refreshInterval: 10000
   });
-
-  useEffect(() => {
-    document.documentElement.scrollTop = 0;
-  }, []);
 
   useEffect(() => {
     if (!isActionOccurrs && updatedTwitts) {

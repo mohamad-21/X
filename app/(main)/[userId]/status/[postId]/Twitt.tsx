@@ -39,6 +39,7 @@ import Link from "next/link";
 import { optimizedText } from "@/app/_utils/optimizedText";
 import LoadingSpinner from "@/app/_ui/LoadingSpinner";
 import { useSession } from "next-auth/react";
+import FollowButton from "@/app/_ui/FollowButton";
 
 const numeral = require("numeral");
 
@@ -74,8 +75,8 @@ function Twitt({
       refreshInterval: 10000,
     }
   );
-  const { data: updatedUserDetails } = useSWR<UserData>('/api/user/details', async () => {
-    const resp = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/user/details?id=${user.id}`);
+  const { data: updatedUserDetails } = useSWR<UserData>('/api/user/info', async () => {
+    const resp = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/user/info?id=${user.id}`);
     const data = await resp.json();
     return data;
   }, {
@@ -129,7 +130,7 @@ function Twitt({
       setUser?.(state => ({ ...state, bookmarks: [...state.bookmarks, twitt] }));
       await bookmarkTwitt({ user_id: user.id, twitt_id: twitt.id });
     }
-    mutate('/api/user/details');
+    mutate('/api/user/info');
     setTimeout(() => {
       setIsActionOccurrs?.(false);
     }, 10000);
@@ -220,29 +221,7 @@ function Twitt({
           </div>
           <div>
             {twitt.user_id != user.id && (
-              <>
-                {twitt.follows.followers.some(follower => follower == user.id) ? (
-                  <Button
-                    variant="bordered"
-                    className="font-bold text-base hover:border-danger/75 hover:bg-danger/20 hover:text-danger"
-                    radius="full"
-                    onPointerEnter={() => setFollowingText("Unfollow")}
-                    onPointerLeave={() => setFollowingText("Following")}
-                    onClick={hanldeUnfollow}
-                  >
-                    {followingText}
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={hanldeFollow}
-                    color="secondary"
-                    className="font-bold text-base"
-                    radius="full"
-                  >
-                    Follow
-                  </Button>
-                )}
-              </>
+              <FollowButton isFollowing={twitt.follows.followers.some(follower => follower == user.id)} onFollow={hanldeFollow} onUnfollow={hanldeUnfollow} />
             )}
           </div>
         </div>

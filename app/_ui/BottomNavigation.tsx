@@ -37,7 +37,7 @@ function BottomNavigation({ user }: { user: UserData }) {
         outline: <IoIosSearch size={30} />,
         filled: <IoIosSearch size={30} />,
       },
-      disabled: true
+      disabled: false
     },
     {
       href: '/notifications',

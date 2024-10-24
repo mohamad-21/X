@@ -95,6 +95,10 @@ function TwittsListWithRevalidation({
   });
 
   useEffect(() => {
+    setTwitts(allTwitts);
+  }, [allTwitts]);
+
+  useEffect(() => {
     if (!isActionOccurrs && updatedTwitts) {
       setTwitts(updatedTwitts);
     }
@@ -111,10 +115,6 @@ function TwittsListWithRevalidation({
       dispatch(setTwittsSlice(twitts));
     }
   }, [twitts]);
-
-  useEffect(() => {
-    setTwitts(allTwitts);
-  }, [allTwitts]);
 
   const groupedTwitts = [];
   for (let i = 0; i < twitts.length; i += 3) {

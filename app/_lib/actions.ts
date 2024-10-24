@@ -237,8 +237,8 @@ export async function deleteTwitt(twitt_id: number | string) {
       twitt[0].comments.length ? deleteComments() : null,
     ]);
   }
-  revalidatePath('/home');
-  revalidatePath(`/${twitt[0].username}`, 'layout');
+  // revalidatePath('/home');
+  // revalidatePath(`/${twitt[0].username}`, 'layout');
 }
 
 export async function getPeopleAndTwittsBySearch(searchTerm: string) {

@@ -19,7 +19,9 @@ async function TwittsWrapper({ user }: { user: UserData }) {
 }
 
 async function Twitts({ user }: { user: UserData }) {
-  const allTwitts = await getAlltwitts();
+  const resp = await fetch(`${process.env.AUTH_URL}/api/twitts`, { cache: 'no-store' });
+  const allTwitts = await resp.json();
+
   return (
     <TwittsList
       user={user}

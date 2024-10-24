@@ -44,16 +44,16 @@ import FollowButton from "@/app/_ui/FollowButton";
 const numeral = require("numeral");
 
 function Twitt({
-  data,
+  data: initialTwitt,
   user: initialUser,
 }: {
   data: ITwitt & { follows: UserFollowingsAndFollowers };
   user: UserData;
 }) {
-  const [twitt, setTwitt] = useState(data);
+  const [twitt, setTwitt] = useState(initialTwitt);
   const [user, setUser] = useState(initialUser);
+  const [isMounted, setIsMounted] = useState(false);
   const [isActionOccurrs, setIsActionOccurrs] = useState(false);
-  const [followingText, setFollowingText] = useState("Following");
   const [imageSize, setSmageSize] = useState({
     width: 1,
     height: 1,
@@ -67,7 +67,7 @@ function Twitt({
   const { data: updatedTwitt } = useSWR<ITwitt & { follows: UserFollowingsAndFollowers }>(
     `/api/twitt`,
     async () => {
-      const resp = await fetch(`/api/twitts/${twitt.id}`);
+      const resp = await fetch(`/api/twitts/${initialTwitt.id}`);
       const data: ITwitt & { follows: UserFollowingsAndFollowers } = await resp.json();
       return data;
     },
@@ -80,7 +80,8 @@ function Twitt({
     const data = await resp.json();
     return data;
   }, {
-    refreshInterval: 10000
+    refreshInterval: 10000,
+    revalidateOnMount: false,
   });
 
   async function handleIncreaseView() {
@@ -175,23 +176,31 @@ function Twitt({
   }
 
   useEffect(() => {
+    setTimeout(() => {
+      setIsMounted(true);
+    }, 5000);
+    document.documentElement.scrollTop = 0;
+    if (!twitt.views.includes(user.id as number)) {
+      handleIncreaseView();
+    }
+  }, []);
+
+  useEffect(() => {
+    setTwitt(initialTwitt);
+  }, [initialTwitt]);
+
+  useEffect(() => {
+    if (!isMounted) return;
     if (!isActionOccurrs && updatedTwitt) {
       setTwitt(updatedTwitt);
     }
-  }, [updatedTwitt, isActionOccurrs]);
+  }, [updatedTwitt, isActionOccurrs, isMounted]);
 
   useEffect(() => {
     if (!isActionOccurrs && updatedUserDetails) {
       setUser(updatedUserDetails);
     }
   }, [updatedUserDetails, isActionOccurrs]);
-
-  useEffect(() => {
-    document.documentElement.scrollTop = 0;
-    if (!twitt.views.includes(user.id as number)) {
-      handleIncreaseView();
-    }
-  }, []);
 
   return (
     <>

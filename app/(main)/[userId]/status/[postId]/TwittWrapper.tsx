@@ -11,6 +11,7 @@ import TwittCommentsWrapper from "./TwittCommentsWrapper";
 import { getUserDetailsFromAPI } from "@/app/_lib/actions";
 
 async function TwittWrapper({ postId }: { postId: string }) {
+  console.log(postId);
   const [session, twitt] = await Promise.all([
     auth(),
     getTwittById(postId),

@@ -171,7 +171,7 @@ function Twitt({
   function handleTwittClick(e: React.MouseEvent<any>) {
     const targetClassList = (e.target as Element).classList;
     if (targetClassList.contains("to-twitt")) {
-      router.push(`/${user.username}/status/${twitt.id}`, { scroll: false });
+      router.push(`/${twitt.username}/status/${twitt.id}`, { scroll: false });
     }
   }
 

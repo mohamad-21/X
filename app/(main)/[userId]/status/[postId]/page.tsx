@@ -8,7 +8,7 @@ export async function generateMetadata({ params }: { params: { postId: string } 
   const twitt = await getTwittById(params.postId);
   if (!twitt) return { title: "not found" }
   return {
-    title: `${twitt.name} on X : ${twitt?.text}`
+    title: `${twitt.name} on X`
   }
 }
 

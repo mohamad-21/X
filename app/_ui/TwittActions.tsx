@@ -105,7 +105,7 @@ function TwittActions({
         className="flex items-center text-default-400 hover:bg-transparent hover:text-primary border-none group gap-0 transition-all duration-150 min-w-0 px-0"
       >
         <div className="rounded-full py-1.5 px-2 group-hover:bg-primary/20">
-          <RiEyeLine size={20} />
+          <RiEyeLine size={15} />
         </div>
         <span className="text-sm">
           {numeral(twitt.views.length).format("0a")}

@@ -5,7 +5,7 @@ import { FaHeart, FaRegComment, FaRegHeart } from "react-icons/fa";
 import { GoBookmark, GoBookmarkFill } from "react-icons/go";
 import { LuRepeat2 } from "react-icons/lu";
 import { MdOutlineFileUpload } from "react-icons/md";
-import { SiSimpleanalytics } from "react-icons/si";
+import { LuEye } from "react-icons/lu";
 import Alert from "./Alert";
 const numeral = require("numeral");
 
@@ -105,7 +105,7 @@ function TwittActions({
         className="flex items-center text-default-400 hover:bg-transparent hover:text-primary border-none group gap-0 transition-all duration-150 min-w-0 px-0"
       >
         <div className="rounded-full py-1.5 px-2 group-hover:bg-primary/20">
-          <SiSimpleanalytics size={12} />
+          <LuEye size={12} />
         </div>
         <span className="text-sm">
           {numeral(twitt.views.length).format("0a")}

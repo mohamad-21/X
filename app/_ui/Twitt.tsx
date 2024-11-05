@@ -407,12 +407,12 @@ function Twitt({
       )}
       {showDeleteConfirm && (
         <DeleteConfirm
-          desc="This can’t be undone and it will be removed from your profile, the timeline of any accounts that follow you, and from search results. "
+          desc={t("deletePostWarning")}
           action={handleTwittDelete}
           onClose={() => setShowDeleteConfirm(false)}
           pending={pending}
         >
-          Delete Post?
+          {t("deletePostTitle")}
         </DeleteConfirm>
       )}
     </div>

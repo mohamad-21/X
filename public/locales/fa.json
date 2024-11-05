@@ -141,5 +141,8 @@
   "unpinnedMessage": "پست از نمایه شما برداشته شد",
   "featureNotAvailable": "این ویژگی در حال حاضر در دسترس نیست.",
   "selectLang": "زبان را انتخاب کنید",
-  "getPremium": "اشتراک Premium"
+  "getPremium": "اشتراک Premium",
+  "cancel": "لغو",
+  "deletePostTitle": "پست حذف شود؟",
+  "deletePostWarning": "این کار قابل واگرد نیست و از نمایه شما، جدول زمانی حساب‌هایی که شما را دنبال می‌کنند و از نتایج جستجو حذف می‌شود."
 }

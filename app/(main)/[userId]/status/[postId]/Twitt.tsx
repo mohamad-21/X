@@ -34,6 +34,7 @@ import {
 } from "@vidstack/react/player/layouts/default";
 import { format } from "date-fns";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Key, useEffect, useState, useTransition } from "react";
@@ -62,28 +63,38 @@ function Twitt({
   const router = useRouter();
   const { mutate } = useSWRConfig();
   const { update } = useSession();
-  const { data: updatedTwitt } = useSWR<ITwitt & { follows: UserFollowingsAndFollowers }>(
+  const { data: updatedTwitt } = useSWR<
+    ITwitt & { follows: UserFollowingsAndFollowers }
+  >(
     `/api/twitt`,
     async () => {
       const resp = await fetch(`/api/twitts/${initialTwitt.id}`);
-      const data: ITwitt & { follows: UserFollowingsAndFollowers } = await resp.json();
+      const data: ITwitt & { follows: UserFollowingsAndFollowers } =
+        await resp.json();
       return data;
     },
     {
       refreshInterval: 10000,
     }
   );
-  const { data: updatedUserDetails } = useSWR<UserData>('/api/user/info', async () => {
-    const resp = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/user/info?id=${user.id}`);
-    const data = await resp.json();
-    return data;
-  }, {
-    refreshInterval: 10000,
-    revalidateOnMount: false,
-  });
+  const { data: updatedUserDetails } = useSWR<UserData>(
+    "/api/user/info",
+    async () => {
+      const resp = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/api/user/info?id=${user.id}`
+      );
+      const data = await resp.json();
+      return data;
+    },
+    {
+      refreshInterval: 10000,
+      revalidateOnMount: false,
+    }
+  );
+  const t = useTranslations();
 
   async function handleIncreaseView() {
-    if (twitt.views.some(view => view == user.id)) return;
+    if (twitt.views.some((view) => view == user.id)) return;
     setTwitt((prev) => ({
       ...prev,
       views: [...prev.views, user.id],
@@ -96,23 +107,36 @@ function Twitt({
     const likeType = twitt.likes.some((like) => like == user.id!)
       ? ActionTypes.UNLIKE_TWITT
       : ActionTypes.LIKE_TWITT;
-    setTwitt(state => ({ ...state, likes: likeType == ActionTypes.LIKE_TWITT ? [...state.likes, user.id] : state.likes.filter((like) => like != user.id) }));
+    setTwitt((state) => ({
+      ...state,
+      likes:
+        likeType == ActionTypes.LIKE_TWITT
+          ? [...state.likes, user.id]
+          : state.likes.filter((like) => like != user.id),
+    }));
 
     await likeTwitt({ twitt, user_id: user.id });
-    mutate('/api/twitt');
+    mutate("/api/twitt");
     setIsActionOccurrs(false);
   }
 
   async function handleRetwitt() {
     setIsActionOccurrs(true);
-    const isAlreadyRetwitted = twitt.retwitts.some(retwitt => retwitt == user.id);
-    setTwitt(state => ({ ...state, retwitts: isAlreadyRetwitted ? state.retwitts.filter(retwitt => retwitt != user.id) : [...state.retwitts, user.id] }));
+    const isAlreadyRetwitted = twitt.retwitts.some(
+      (retwitt) => retwitt == user.id
+    );
+    setTwitt((state) => ({
+      ...state,
+      retwitts: isAlreadyRetwitted
+        ? state.retwitts.filter((retwitt) => retwitt != user.id)
+        : [...state.retwitts, user.id],
+    }));
     if (isAlreadyRetwitted) {
       await removePostRetwitt({ twitt_id: twitt.id, user_id: user.id });
     } else {
       await retwittPost({ twitt_id: twitt.id, user_id: user.id });
     }
-    mutate('/api/twitt');
+    mutate("/api/twitt");
     setTimeout(() => {
       setIsActionOccurrs(false);
     }, 1500);
@@ -120,16 +144,26 @@ function Twitt({
 
   async function handleBookmark() {
     setIsActionOccurrs?.(true);
-    const hasAlreadyBookmarked = user.bookmarks.some(bookmark => bookmark.id == twitt.id);
+    const hasAlreadyBookmarked = user.bookmarks.some(
+      (bookmark) => bookmark.id == twitt.id
+    );
 
     if (hasAlreadyBookmarked) {
-      setUser?.(state => ({ ...state, bookmarks: state.bookmarks.filter(bookmark => bookmark.id !== twitt.id) }));
+      setUser?.((state) => ({
+        ...state,
+        bookmarks: state.bookmarks.filter(
+          (bookmark) => bookmark.id !== twitt.id
+        ),
+      }));
       await unBookmarkTwitt({ user_id: user.id, twitt_id: twitt.id });
     } else {
-      setUser?.(state => ({ ...state, bookmarks: [...state.bookmarks, twitt] }));
+      setUser?.((state) => ({
+        ...state,
+        bookmarks: [...state.bookmarks, twitt],
+      }));
       await bookmarkTwitt({ user_id: user.id, twitt_id: twitt.id });
     }
-    mutate('/api/user/info');
+    mutate("/api/user/info");
     setTimeout(() => {
       setIsActionOccurrs?.(false);
     }, 10000);
@@ -137,17 +171,31 @@ function Twitt({
 
   async function hanldeFollow() {
     setTimeout(() => {
-      setTwitt(prev => ({ ...prev, follows: { ...prev.follows, followers: [...prev.follows.followers, user.id as number] } }));
+      setTwitt((prev) => ({
+        ...prev,
+        follows: {
+          ...prev.follows,
+          followers: [...prev.follows.followers, user.id as number],
+        },
+      }));
     }, 600);
-    update('trigger');
+    update("trigger");
     await follow(user.id, twitt.user_id);
   }
 
   async function hanldeUnfollow() {
     setTimeout(() => {
-      setTwitt(prev => ({ ...prev, follows: { ...prev.follows, followers: prev.follows.followers.filter(follower => follower != user.id) } }));
+      setTwitt((prev) => ({
+        ...prev,
+        follows: {
+          ...prev.follows,
+          followers: prev.follows.followers.filter(
+            (follower) => follower != user.id
+          ),
+        },
+      }));
     }, 600);
-    update('trigger');
+    update("trigger");
     await unFollow(user.id, twitt.user_id);
   }
 
@@ -155,14 +203,14 @@ function Twitt({
     setMessage("");
     if (key === "delete") {
       setShowDeleteConfirm(true);
-    } else if (key === 'pin') {
-      setMessage("Post pinned on your profile");
+    } else if (key === "pin") {
+      setMessage(t("pinnedMessage"));
       await pinTwittToProfile({ twitt_id: twitt.id, user_id: user.id });
-    } else if (key === 'unpin') {
-      setMessage("Post Unpinned from your profile");
+    } else if (key === "unpin") {
+      setMessage(t("unpinnedMessage"));
       await unpinTwittFromProfile(twitt.id);
     } else {
-      setMessage("This action is not available for now.");
+      setMessage(t("featureNotAvailable"));
     }
   }
 
@@ -216,8 +264,16 @@ function Twitt({
                 />
               </Link>
               <div>
-                <Link href={`/${twitt.username}`} className="font-bold leading-5 block text-foreground">{twitt.name}</Link>
-                <Link href={`/${twitt.username}`} className="text-default-400 text-[15px] block">
+                <Link
+                  href={`/${twitt.username}`}
+                  className="font-bold leading-5 block text-foreground"
+                >
+                  {twitt.name}
+                </Link>
+                <Link
+                  href={`/${twitt.username}`}
+                  className="text-default-400 text-[15px] block"
+                >
                   @{twitt.username}
                 </Link>
               </div>
@@ -230,7 +286,13 @@ function Twitt({
           </div>
           <div>
             {twitt.user_id != user.id && (
-              <FollowButton isFollowing={twitt.follows.followers.some(follower => follower == user.id)} onFollow={hanldeFollow} onUnfollow={hanldeUnfollow} />
+              <FollowButton
+                isFollowing={twitt.follows.followers.some(
+                  (follower) => follower == user.id
+                )}
+                onFollow={hanldeFollow}
+                onUnfollow={hanldeUnfollow}
+              />
             )}
           </div>
         </div>
@@ -244,11 +306,13 @@ function Twitt({
         )}
         {twitt.media && ["image", "gif"].includes(twitt.media_type ?? "") && (
           <div className="to-twitt mt-4">
-            {twitt.media_type === 'gif' ? (
+            {twitt.media_type === "gif" ? (
               <img
                 src={twitt.media}
                 alt={twitt.text}
-                className={`${imageSize.width ? "" : "hidden"} to-twitt object-cover rounded-2xl border border-default mx-auto block`}
+                className={`${
+                  imageSize.width ? "" : "hidden"
+                } to-twitt object-cover rounded-2xl border border-default mx-auto block`}
                 onLoad={(target) => {
                   setSmageSize({
                     width: target.currentTarget.naturalWidth,
@@ -258,12 +322,13 @@ function Twitt({
                 width={imageSize.width}
                 height={imageSize.height}
               />
-
             ) : (
               <img
                 src={twitt.media}
                 alt={twitt.text}
-                className={`${imageSize.width ? "" : "hidden"} to-twitt object-cover rounded-2xl border border-default mx-auto block`}
+                className={`${
+                  imageSize.width ? "" : "hidden"
+                } to-twitt object-cover rounded-2xl border border-default mx-auto block`}
                 onLoad={(target) => {
                   setSmageSize({
                     width: target.currentTarget.naturalWidth,

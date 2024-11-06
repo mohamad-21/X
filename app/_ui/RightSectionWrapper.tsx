@@ -12,13 +12,33 @@ async function RightSectionWrapper() {
       <div className="p-4 rounded-2xl border border-default flex flex-col gap-3">
         <h2 className="text-xl font-bold">{t("subscribePremiumTitle")}</h2>
         <p>{t("subscribePremiumDesc")}</p>
-        <Button color="primary" as={Link} href="#" radius="full" className="text-base font-bold max-w-max hover:no-underline">{t("subscribe")}</Button>
+        <Button
+          color="primary"
+          as={Link}
+          href="#"
+          radius="full"
+          className="text-base font-bold max-w-max hover:no-underline"
+        >
+          {t("subscribe")}
+        </Button>
       </div>
       <div className="py-4 rounded-2xl border border-default w-full">
         <PeopleToFollowSuggests />
       </div>
+      <div className="py-4">
+        <h4>
+          Created by{" "}
+          <a
+            href="mailto:wyattmohammad1371017@gmail.com"
+            target="_blank"
+            className="text-primary"
+          >
+            M
+          </a>
+        </h4>
+      </div>
     </>
-  )
+  );
 }
 
 export default RightSectionWrapper;

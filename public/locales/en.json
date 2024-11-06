@@ -132,6 +132,7 @@
   "trySearchingSomethingElse": "Try searching for something else.",
   "people": "People",
   "search": "Search",
+  "postsWithTagBrowserTitle": "Posts with {tag} tag",
   "postsWithTag": "Posts with {tag} tag",
   "postsWithTagNotFound": "Posts with {tag} tag was not found",
   "onX": "on X",
@@ -145,5 +146,6 @@
   "getPremium": "Get Premium",
   "cancel": "Cancel",
   "deletePostTitle": "Delete post?",
-  "deletePostWarning": "This can't be undone and it will be removed from your profile, the timeline of any accounts that follow you, and from search results."
+  "deletePostWarning": "This can't be undone and it will be removed from your profile, the timeline of any accounts that follow you, and from search results.",
+  "views": "views"
 }

@@ -15,7 +15,7 @@ export const generateMetadata = async ({
 }): Promise<Metadata> => {
   const t = await getTranslations();
   return {
-    title: t("postsWithTag", { tag: params.hashtag }),
+    title: t("postsWithTagBrowserTitle", { tag: params.hashtag }),
   };
 };
 
@@ -39,14 +39,14 @@ async function Wrapper({ params }: { params: { hashtag: string } }) {
   if (!twitts.length)
     return (
       <h1 className="text-xl font-bold py-3 px-4">
-        {t("postsWithTagNotFound", { tag: `#${hashtag}` })}
+        {t("postsWithTagNotFound", { tag: hashtag })}
       </h1>
     );
   if (!user) return;
 
   return (
     <div>
-      <PageHeader title={t("postsWithTag", { tag: `#${hashtag}` })} />
+      <PageHeader title={t("postsWithTag", { tag: hashtag })} />
       <TwittsList
         allTwitts={twitts}
         user={user}

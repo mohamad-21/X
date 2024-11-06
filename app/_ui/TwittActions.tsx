@@ -128,7 +128,7 @@ function TwittActions({
             )}
           </div>
         </Button>
-        <Button
+        {/* <Button
           isIconOnly
           radius="full"
           size="sm"
@@ -141,7 +141,7 @@ function TwittActions({
           >
             <MdOutlineFileUpload size={20} />
           </div>
-        </Button>
+        </Button> */}
       </div>
       {showUnavailable && (
         <Alert type="fixed">This action is not available for now.</Alert>

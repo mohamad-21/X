@@ -26,6 +26,7 @@ import LoadingSpinner from "@/app/_ui/LoadingSpinner";
 import { ActionTypes } from "@/app/_ui/Twitt";
 import TwittActions from "@/app/_ui/TwittActions";
 import TwittSettings from "@/app/_ui/TwittSettings";
+import UserProfilePhotoModal from "@/app/_ui/UserProfilePhotoModal";
 import { optimizedText } from "@/app/_utils/optimizedText";
 import { MediaPlayer, MediaProvider } from "@vidstack/react";
 import {
@@ -59,6 +60,7 @@ function Twitt({
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [message, setMessage] = useState("");
+  const [showImagePreview, setShowImagePreview] = useState(false);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
   const { mutate } = useSWRConfig();
@@ -221,6 +223,10 @@ function Twitt({
     });
   }
 
+  async function handleImageClick() {
+    setShowImagePreview(true);
+  }
+
   useEffect(() => {
     setTimeout(() => {
       setIsMounted(true);
@@ -305,7 +311,7 @@ function Twitt({
           />
         )}
         {twitt.media && ["image", "gif"].includes(twitt.media_type ?? "") && (
-          <div className="to-twitt mt-4">
+          <div className="to-twitt mt-4 cursor-pointer">
             {twitt.media_type === "gif" ? (
               <img
                 src={twitt.media}
@@ -326,6 +332,7 @@ function Twitt({
               <img
                 src={twitt.media}
                 alt={twitt.text}
+                onClick={handleImageClick}
                 className={`${
                   imageSize.width ? "" : "hidden"
                 } to-twitt object-cover rounded-2xl border border-default mx-auto block`}
@@ -361,7 +368,7 @@ function Twitt({
             <span className="text-foreground">
               {numeral(twitt.views.length).format("0a")}
             </span>{" "}
-            Views
+            {t("views")}
           </li>
         </ul>
         <TwittActions
@@ -389,12 +396,20 @@ function Twitt({
       </div>
       {showDeleteConfirm && (
         <DeleteConfirm
-          desc="This can’t be undone and it will be removed from your profile, the timeline of any accounts that follow you, and from search results. "
+          desc={t("deletePostWarning")}
           action={handleTwittDelete}
           pending={pending}
+          onClose={() => setShowDeleteConfirm(false)}
         >
-          Delete Post?
+          {t("deletePostTitle")}
         </DeleteConfirm>
+      )}
+      {showImagePreview && (
+        <UserProfilePhotoModal
+          mode="twitt_media"
+          onClose={() => setShowImagePreview(false)}
+          src={twitt.media!}
+        />
       )}
     </>
   );

@@ -132,7 +132,8 @@
   "trySearchingSomethingElse": "سعی کنید چیز دیگری را جستجو کنید.",
   "people": "افراد",
   "search": "جستجو",
-  "postsWithTag": "{tag} پست ها با تگ",
+  "postsWithTagBrowserTitle": "{tag} پست ها با تگ",
+  "postsWithTag": "پست ها با تگ {tag}",
   "onX": "در X",
   "accountDoesNotExists": "این اکانت وجود ندارد",
   "followMessage": "شما اکنون {user} را دنبال می کنید",
@@ -144,5 +145,6 @@
   "getPremium": "اشتراک Premium",
   "cancel": "لغو",
   "deletePostTitle": "پست حذف شود؟",
-  "deletePostWarning": "این کار قابل واگرد نیست و از نمایه شما، جدول زمانی حساب‌هایی که شما را دنبال می‌کنند و از نتایج جستجو حذف می‌شود."
+  "deletePostWarning": "این کار قابل واگرد نیست و از نمایه شما، جدول زمانی حساب‌هایی که شما را دنبال می‌کنند و از نتایج جستجو حذف می‌شود.",
+  "views": "بازدید"
 }

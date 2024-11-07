@@ -11,7 +11,7 @@ import {
   DropdownMenu,
   DropdownTrigger,
 } from "@nextui-org/react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -19,8 +19,8 @@ import { BiSolidUser, BiUser } from "react-icons/bi";
 import { GoBookmark, GoBookmarkFill, GoHome, GoHomeFill } from "react-icons/go";
 import { IoIosSearch } from "react-icons/io";
 import { IoNotifications, IoNotificationsOutline } from "react-icons/io5";
-import { IoLanguageOutline } from "react-icons/io5";
 import Alert from "./Alert";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 function Navigation({
   user,
@@ -31,6 +31,7 @@ function Navigation({
   const pathname = usePathname();
   const notifs = useAppSelector((state) => state.app.notifications);
   const t = useTranslations("Navigation");
+  const locale = useLocale();
 
   const links = [
     {
@@ -76,15 +77,6 @@ function Navigation({
       logo: {
         outline: <BiUser size={30} />,
         filled: <BiSolidUser size={30} />,
-      },
-      disabled: false,
-    },
-    {
-      href: "/settings/language",
-      text: t("language"),
-      logo: {
-        outline: <IoLanguageOutline size={30} />,
-        filled: <IoLanguageOutline size={30} />,
       },
       disabled: false,
     },
@@ -235,6 +227,9 @@ function Navigation({
             )}
           </li>
         ))}
+        <li>
+          <LanguageSwitcher />
+        </li>
         <li>
           <Button
             color="primary"

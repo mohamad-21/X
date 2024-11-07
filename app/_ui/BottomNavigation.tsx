@@ -9,13 +9,10 @@ import { useEffect, useState } from "react";
 import { BiSolidUser, BiUser } from "react-icons/bi";
 import { GoBookmark, GoBookmarkFill, GoHome, GoHomeFill } from "react-icons/go";
 import { IoIosSearch } from "react-icons/io";
-import {
-  IoLanguageOutline,
-  IoNotifications,
-  IoNotificationsOutline,
-} from "react-icons/io5";
+import { IoNotifications, IoNotificationsOutline } from "react-icons/io5";
 import { useAppSelector } from "../_lib/hooks";
 import Alert from "./Alert";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 function BottomNavigation({
   user,
@@ -65,14 +62,6 @@ function BottomNavigation({
       logo: {
         outline: <BiUser size={30} />,
         filled: <BiSolidUser size={30} />,
-      },
-      disabled: false,
-    },
-    {
-      href: "/settings/language",
-      logo: {
-        outline: <IoLanguageOutline size={30} />,
-        filled: <IoLanguageOutline size={30} />,
       },
       disabled: false,
     },
@@ -146,6 +135,9 @@ function BottomNavigation({
             )}
           </li>
         ))}
+        <li>
+          <LanguageSwitcher isBottomNav />
+        </li>
       </ul>
 
       <Button

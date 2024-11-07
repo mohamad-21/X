@@ -36,9 +36,10 @@ function PageHeader({
             radius="full"
             isIconOnly
             onClick={() => router.back()}
-          >
-            {locale === "fa" ? <ArrowRightOutlined /> : <ArrowLeftOutlined />}
-          </Button>
+            startContent={
+              locale === "fa" ? <ArrowRightOutlined /> : <ArrowLeftOutlined />
+            }
+          ></Button>
           {(title || desc) && (
             <div>
               {title && (

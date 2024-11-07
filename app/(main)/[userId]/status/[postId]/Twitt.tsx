@@ -311,7 +311,10 @@ function Twitt({
           />
         )}
         {twitt.media && ["image", "gif"].includes(twitt.media_type ?? "") && (
-          <div className="to-twitt mt-4 cursor-pointer">
+          <div
+            className="to-twitt mt-4 cursor-pointer"
+            onClick={handleImageClick}
+          >
             {twitt.media_type === "gif" ? (
               <img
                 src={twitt.media}
@@ -332,7 +335,6 @@ function Twitt({
               <img
                 src={twitt.media}
                 alt={twitt.text}
-                onClick={handleImageClick}
                 className={`${
                   imageSize.width ? "" : "hidden"
                 } to-twitt object-cover rounded-2xl border border-default mx-auto block`}

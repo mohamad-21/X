@@ -52,7 +52,6 @@ function Twitt({
 }) {
   const [twitt, setTwitt] = useState(initialTwitt);
   const [user, setUser] = useState(initialUser);
-  const [isMounted, setIsMounted] = useState(false);
   const [isActionOccurrs, setIsActionOccurrs] = useState(false);
   const [imageSize, setSmageSize] = useState({
     width: 1,
@@ -65,27 +64,31 @@ function Twitt({
   const router = useRouter();
   const { mutate } = useSWRConfig();
   const { update } = useSession();
-  const { data: updatedTwitt } = useSWR<
-    ITwitt & { follows: UserFollowingsAndFollowers }
-  >(
+  useSWR<ITwitt & { follows: UserFollowingsAndFollowers }>(
     `/api/twitt`,
     async () => {
       const resp = await fetch(`/api/twitts/${initialTwitt.id}`);
       const data: ITwitt & { follows: UserFollowingsAndFollowers } =
         await resp.json();
+      if (!isActionOccurrs && data) {
+        setTwitt(data);
+      }
       return data;
     },
     {
       refreshInterval: 10000,
     }
   );
-  const { data: updatedUserDetails } = useSWR<UserData>(
+  useSWR<UserData>(
     "/api/user/info",
     async () => {
       const resp = await fetch(
         `${process.env.NEXT_PUBLIC_URL}/api/user/info?id=${user.id}`
       );
       const data = await resp.json();
+      if (!isActionOccurrs && data) {
+        setUser(data);
+      }
       return data;
     },
     {
@@ -116,10 +119,11 @@ function Twitt({
           ? [...state.likes, user.id]
           : state.likes.filter((like) => like != user.id),
     }));
-
     await likeTwitt({ twitt, user_id: user.id });
     mutate("/api/twitt");
-    setIsActionOccurrs(false);
+    setTimeout(() => {
+      setIsActionOccurrs(false);
+    }, 7000);
   }
 
   async function handleRetwitt() {
@@ -228,9 +232,6 @@ function Twitt({
   }
 
   useEffect(() => {
-    setTimeout(() => {
-      setIsMounted(true);
-    }, 5000);
     document.documentElement.scrollTop = 0;
     if (!twitt.views.includes(user.id as number)) {
       handleIncreaseView();
@@ -240,19 +241,6 @@ function Twitt({
   useEffect(() => {
     setTwitt(initialTwitt);
   }, [initialTwitt]);
-
-  useEffect(() => {
-    if (!isMounted) return;
-    if (!isActionOccurrs && updatedTwitt) {
-      setTwitt(updatedTwitt);
-    }
-  }, [updatedTwitt, isActionOccurrs, isMounted]);
-
-  useEffect(() => {
-    if (!isActionOccurrs && updatedUserDetails) {
-      setUser(updatedUserDetails);
-    }
-  }, [updatedUserDetails, isActionOccurrs]);
 
   return (
     <>

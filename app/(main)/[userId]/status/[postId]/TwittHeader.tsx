@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 
 function TwittHeader() {
   const t = useTranslations();
-  return <PageHeader title={t("postsCount")} />;
+  return <PageHeader title={t("postHeadertitle")} />;
 }
 
 export default TwittHeader;

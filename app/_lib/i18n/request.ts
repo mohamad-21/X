@@ -6,7 +6,6 @@ export default getRequestConfig(async () => {
   const headersList = headers().get("accept-language");
   const browserLocale = headersList?.split(",")[0].split("-")[0] || "";
   const locale = cookieLocale || browserLocale || "en";
-  console.log(browserLocale);
 
   return {
     locale,

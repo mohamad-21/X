@@ -11,6 +11,11 @@ const nextConfig = {
       },
     ],
   },
+  experimental: {
+    staleTimes: {
+      dynamic: 3
+    }
+  }
 };
 
 export default withNextIntl(nextConfig);

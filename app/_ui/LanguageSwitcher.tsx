@@ -45,7 +45,7 @@ function LanguageSwitcher({ isBottomNav }: { isBottomNav?: boolean }) {
           >
             <IoLanguageOutline size={30} />
             {!isBottomNav && (
-              <span className="xl:block hidden">{t("language")}</span>
+              <span className="xl:block hidden">{t("Navigation.language")}</span>
             )}
           </Button>
         </DropdownTrigger>

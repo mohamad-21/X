@@ -1,0 +1,9 @@
+name: twitter
+nextjs:
+    packageManager: npm
+    path: .
+    scripts:
+        deploy:
+            - npm install
+region: eu-central-1
+yamlVersion: 2

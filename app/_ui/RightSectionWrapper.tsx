@@ -29,11 +29,11 @@ async function RightSectionWrapper() {
         <h4>
           Created by{" "}
           <a
-            href="mailto:wyattmohammad1371017@gmail.com"
+            href="https://github.com/mohamad-21/x"
             target="_blank"
             className="text-primary"
           >
-            M
+            M21
           </a>
         </h4>
       </div>

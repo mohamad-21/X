@@ -3,6 +3,7 @@
 import { useAppDispatch } from "../_lib/hooks";
 import useSWR from "swr";
 import { setNotifications } from "../_lib/slices/appSlice";
+import { refreshInterval } from "../_lib/swr";
 
 function NotificationsUpdater() {
   const dispatch = useAppDispatch();
@@ -13,7 +14,7 @@ function NotificationsUpdater() {
       dispatch(setNotifications(data));
     }
   }, {
-    refreshInterval: 20000
+    refreshInterval: refreshInterval * 3
   });
 
   return null;

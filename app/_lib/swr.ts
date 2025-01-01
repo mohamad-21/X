@@ -10,3 +10,5 @@ export function useMutateAll() {
     mutate("/api/user/info");
   }
 }
+
+export const refreshInterval = 10000;

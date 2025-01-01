@@ -8,6 +8,7 @@ import {
 } from "@/app/_lib/definitions";
 import { useAppDispatch, useRouteChangeTransition } from "@/app/_lib/hooks";
 import { setUserData } from "@/app/_lib/slices/userSlice";
+import { refreshInterval } from "@/app/_lib/swr";
 import FollowButton from "@/app/_ui/FollowButton";
 import PageHeader from "@/app/_ui/PageHeader";
 import { Button } from "@nextui-org/button";
@@ -52,7 +53,7 @@ function UserProfile({ user, headerSubtitle, follows, sessionUser }: Props) {
       return data;
     },
     {
-      refreshInterval: 10000,
+      refreshInterval: refreshInterval,
     }
   );
 

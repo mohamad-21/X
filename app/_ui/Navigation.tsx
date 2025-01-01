@@ -113,17 +113,21 @@ function Navigation({
                       : {}
                   }
                 >
-                  <Badge content="" size="sm" color="primary">
+                  {/* <Badge content="" size="sm" color="primary">
                     {pathname
                       ? pathname === link.href
                         ? link.logo.filled
                         : link.logo.outline
                       : null}
-                  </Badge>
+                  </Badge> */}
+                  {pathname
+                    ? pathname === link.href
+                      ? link.logo.filled
+                      : link.logo.outline
+                    : null}
                   <span
-                    className={`xl:block hidden ${
-                      pathname === link.href ? "font-bold" : ""
-                    }`}
+                    className={`xl:block hidden ${pathname === link.href ? "font-bold" : ""
+                      }`}
                   >
                     {link?.text}
                   </span>
@@ -142,13 +146,18 @@ function Navigation({
                       : {}
                   }
                 >
-                  <Badge content="" size="sm" color="primary">
+                  {/* <Badge content="" size="sm" color="primary">
                     {pathname
                       ? pathname === link.href
                         ? link.logo.filled
                         : link.logo.outline
                       : null}
-                  </Badge>
+                  </Badge> */}
+                  {pathname
+                    ? pathname === link.href
+                      ? link.logo.filled
+                      : link.logo.outline
+                    : null}
                 </Button>
               </>
             ) : (
@@ -184,9 +193,8 @@ function Navigation({
                     </>
                   )}
                   <span
-                    className={`xl:block hidden ${
-                      pathname === link.href ? "font-bold" : ""
-                    }`}
+                    className={`xl:block hidden ${pathname === link.href ? "font-bold" : ""
+                      }`}
                   >
                     {link?.text}
                   </span>

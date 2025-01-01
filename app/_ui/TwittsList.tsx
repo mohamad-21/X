@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import useSWR from "swr";
 import Twitt from "./Twitt";
+import { refreshInterval } from "../_lib/swr";
 
 type TwittsListProps = {
   user: UserData;
@@ -86,7 +87,7 @@ function TwittsListWithRevalidation({
       return data;
     },
     {
-      refreshInterval: 7000,
+      refreshInterval: refreshInterval,
     }
   );
   useSWR<UserData>('/api/user/info', async () => {
@@ -97,7 +98,7 @@ function TwittsListWithRevalidation({
     }
     return data;
   }, {
-    refreshInterval: 10000
+    refreshInterval: refreshInterval
   });
 
   useEffect(() => {

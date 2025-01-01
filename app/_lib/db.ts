@@ -15,7 +15,7 @@ export async function query<T>(query: string, values: any[] = []): Promise<T> {
     return result as T;
   } catch (err: any) {
     console.error(err.message);
-    throw new Error('database error.');
+    throw new Error('database error:' + err.message);
   } finally {
     conn.end();
   }

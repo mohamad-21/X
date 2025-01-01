@@ -93,11 +93,17 @@ function BottomNavigation({
                 }
                 radius="full"
               >
-                <Badge content="" size="sm" color="primary">
+                {/* <Badge content="" size="sm" color="primary">
                   {pathname === link.href
                     ? link.logo.filled
                     : link.logo.outline}
-                </Badge>
+                </Badge> */}
+
+                {pathname
+                  ? pathname === link.href
+                    ? link.logo.filled
+                    : link.logo.outline
+                  : null}
               </Button>
             ) : (
               <Button

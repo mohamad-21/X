@@ -18,6 +18,7 @@ import {
   UserData,
   UserFollowingsAndFollowers,
 } from "@/app/_lib/definitions";
+import { refreshInterval } from "@/app/_lib/swr";
 import Alert from "@/app/_ui/Alert";
 import CreatePost from "@/app/_ui/createPost/CreatePost";
 import DeleteConfirm from "@/app/_ui/DeleteConfirm";
@@ -76,7 +77,7 @@ function Twitt({
       return data;
     },
     {
-      refreshInterval: 10000,
+      refreshInterval: refreshInterval,
     }
   );
   useSWR<UserData>(
@@ -92,7 +93,7 @@ function Twitt({
       return data;
     },
     {
-      refreshInterval: 10000,
+      refreshInterval: refreshInterval,
       revalidateOnMount: false,
     }
   );
@@ -307,9 +308,8 @@ function Twitt({
               <img
                 src={twitt.media}
                 alt={twitt.text}
-                className={`${
-                  imageSize.width ? "" : "hidden"
-                } to-twitt object-cover rounded-2xl border border-default mx-auto block`}
+                className={`${imageSize.width ? "" : "hidden"
+                  } to-twitt object-cover rounded-2xl border border-default mx-auto block`}
                 onLoad={(target) => {
                   setSmageSize({
                     width: target.currentTarget.naturalWidth,
@@ -323,9 +323,8 @@ function Twitt({
               <img
                 src={twitt.media}
                 alt={twitt.text}
-                className={`${
-                  imageSize.width ? "" : "hidden"
-                } to-twitt object-cover rounded-2xl border border-default mx-auto block`}
+                className={`${imageSize.width ? "" : "hidden"
+                  } to-twitt object-cover rounded-2xl border border-default mx-auto block`}
                 onLoad={(target) => {
                   setSmageSize({
                     width: target.currentTarget.naturalWidth,

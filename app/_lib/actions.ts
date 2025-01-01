@@ -25,7 +25,7 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { getTranslations } from "next-intl/server";
 
-interface CredentialsData extends SignupData, PasswordData {}
+interface CredentialsData extends SignupData, PasswordData { }
 
 interface OAuthData {
   name: string;
@@ -43,9 +43,8 @@ export async function getAlltwitts({
   username?: string;
   with_reply?: boolean;
 } = {}): Promise<ITwitt[]> {
-  let condition = `${
-    byUsername && username ? "where users.username = ?" : ""
-  } ${!with_reply ? "and reply_to is null" : ""}`;
+  let condition = `${byUsername && username ? "where users.username = ?" : ""
+    } ${!with_reply ? "and reply_to is null" : ""}`;
   const params: any[] = [];
   let retwitts: ITwitt[] = [];
 
@@ -92,6 +91,7 @@ export async function getTwittsBySearch(searchTerm: string) {
 
 export async function logOut() {
   await signOut();
+  revalidatePath("/");
   redirect("/");
 }
 
@@ -161,10 +161,10 @@ export async function getUserDataById(
     mediaOnly
       ? getUserTwittsByMedia(id)
       : getAlltwitts({
-          byUsername: true,
-          username: user.username,
-          with_reply: twittsWithReply,
-        }),
+        byUsername: true,
+        username: user.username,
+        with_reply: twittsWithReply,
+      }),
     getUserBookmarks(user.id),
   ]);
   return {
@@ -195,8 +195,7 @@ export async function getUserDetailsFromAPI(
     twittsType = "media_only";
   }
   const resp = await fetch(
-    `${process.env.AUTH_URL}/api/user/info?id=${id}${
-      twittsType ? `&twitts_type=${twittsType}` : ""
+    `${process.env.AUTH_URL}/api/user/info?id=${id}${twittsType ? `&twitts_type=${twittsType}` : ""
     }${onlyDetails ? "&full_data=false" : ""}`
   );
 

@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind utilities;
+@tailwind components;
+
+img {
+  @apply select-none pointer-events-none
+}
+
+a {
+  @apply text-primary hover:underline
+  
+}
+
+button {
+  @apply data-[pressed=true]:scale-100 !important
+}
+
+.epr_-8623pq {
+  @apply bg-background rounded-full border-2 border-default focus:border-primary !important;
+}
+
+.animate-top-header {
+  animation: animateTopHeader 10s ease-in-out forwards;
+  animation-delay: 2s;
+  --animation-mt: -1.6rem;
+  margin-top: var(--animation-mt);
+}
+
+@keyframes animateTopHeader {
+  0% {
+    margin-top: var(--animation-mt);
+  }
+  15%, 80% {
+    margin-top: 0;
+  }
+  100% {
+  margin-top: var(--animation-mt);
+    display: none;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  .animate-top-header {
+    --animation-mt: -2.6rem;
+    background-color: #3b4047;
+  }
+}
+
+.primary-gradient-effect {
+  background: linear-gradient(180deg, #56759f, transparent);
+  filter: blur(125px);
+}
